@@ -6,12 +6,25 @@ const connectDB = require('./config/db');
 const seedData = require('./seed');
 const Admin = require('./models/Admin');
 
-dotenv.config({ path: '../.env' });
+// Load environment variables
+dotenv.config(); // Prioritize root .env or platform variables
+dotenv.config({ path: '../.env' }); // Fallback for local development
 
 const app = express();
 
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'https://adnanmitul.me',
+  'https://www.adnanmitul.me',
+  'http://localhost:5173'
+].filter(Boolean);
+
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

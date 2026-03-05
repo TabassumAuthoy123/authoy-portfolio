@@ -5,8 +5,13 @@ const connectDB = async () => {
   try {
     let mongoUri = process.env.MONGO_URI;
     
-    // Check if the URI is a placeholder. If yes, start an in-memory MongoDB
+    // Use Atlas URI from Environment Variables
     if (!mongoUri || mongoUri.includes('YOUR_USERNAME') || mongoUri.includes('xxxxx')) {
+      // If we are in production, don't start Memory Server
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('MISSING_MONGO_URI: Please set MONGO_URI in your environment settings.');
+      }
+      
       console.log('Detected placeholder MONGO_URI. Starting MongoDB Memory Server...');
       const mongoServer = await MongoMemoryServer.create();
       mongoUri = mongoServer.getUri();
