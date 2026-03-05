@@ -1,0 +1,67 @@
+﻿[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 48 modules transformed.
+node.exe : [31mΓ£ù[39m Build failed in 
+3.57s
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" 
+"C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified 
+   : ([31mΓ£ù[39m Build failed in 3.57s  
+  :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeComman 
+   dError
+ 
+[31merror during build:
+[31msrc/components/Skills.jsx (8:39): 
+"SiVisualstudiocode" is not exported by 
+"node_modules/react-icons/si/index.mjs", 
+imported by 
+"src/components/Skills.jsx".[31m
+file: [36mF:/Softify/portfolio/client/src/
+components/Skills.jsx:8:39[31m
+[33m
+ 6:   SiTailwindcss, SiBootstrap, 
+SiLaravel, SiNodedotjs, SiExpress,
+ 7:   SiPostgresql, SiMysql, SiMongodb, 
+SiFirebase, SiSupabase,
+ 8:   SiGit, SiGithub, SiDocker, SiVercel, 
+SiVisualstudiocode
+                                           
+^
+ 9: } from 'react-icons/si';
+10: import { FaJava } from 
+'react-icons/fa';
+[31m
+    at getRollupError (file:///F:/Softify/p
+ortfolio/client/node_modules/rollup/dist/es
+/shared/parseAst.js:402:41)
+    at error (file:///F:/Softify/portfolio/
+client/node_modules/rollup/dist/es/shared/p
+arseAst.js:398:42)
+    at Module.error (file:///F:/Softify/por
+tfolio/client/node_modules/rollup/dist/es/s
+hared/node-entry.js:17040:16)
+    at Module.traceVariable (file:///F:/Sof
+tify/portfolio/client/node_modules/rollup/d
+ist/es/shared/node-entry.js:17452:29)
+    at ModuleScope.findVariable (file:///F:
+/Softify/portfolio/client/node_modules/roll
+up/dist/es/shared/node-entry.js:15070:39)
+    at Identifier.bind (file:///F:/Softify/
+portfolio/client/node_modules/rollup/dist/e
+s/shared/node-entry.js:5447:40)
+    at CallExpression.bind (file:///F:/Soft
+ify/portfolio/client/node_modules/rollup/di
+st/es/shared/node-entry.js:2825:28)
+    at CallExpression.bind (file:///F:/Soft
+ify/portfolio/client/node_modules/rollup/di
+st/es/shared/node-entry.js:12179:15)
+    at Property.bind (file:///F:/Softify/po
+rtfolio/client/node_modules/rollup/dist/es/
+shared/node-entry.js:2829:23)
+    at ObjectExpression.bind (file:///F:/So
+ftify/portfolio/client/node_modules/rollup/
+dist/es/shared/node-entry.js:2825:28)[39m
