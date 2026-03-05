@@ -56,7 +56,7 @@ connectDB().then(async () => {
     await seedData();
   }
 
-  if (process.env.NODE_ENV !== 'production' || !mongoUri.includes('mongodb.net')) {
+  if (process.env.NODE_ENV !== 'production' || !process.env.MONGO_URI.includes('mongodb.net')) {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
