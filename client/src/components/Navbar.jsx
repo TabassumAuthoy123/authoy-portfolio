@@ -83,8 +83,8 @@ export default function Navbar() {
             <span className="nav__logo-text">Adnan</span>
           </a>
 
-          {/* Right — Actions */}
-          <div className="nav__actions">
+          {/* Right — Desktop Actions */}
+          <div className="nav__actions desktop-only">
             <a href="/gallery" className="nav__action-pill">
               <FiImage size={15} />
               <span>Gallery</span>
@@ -101,11 +101,57 @@ export default function Navbar() {
               <span>Download CV</span>
             </a>
           </div>
+
+          {/* Mobile Controls */}
+          <div className="nav__mobile-controls mobile-only">
+            <button className="nav__action-icon" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === 'dark' ? <FiSun size={17} /> : <FiMoon size={17} />}
+            </button>
+            <button className="nav__mobile-toggle" onClick={() => setOpen(!open)}>
+              {open ? <FiX size={26} /> : <FiMenu size={26} />}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Floating center pill nav — Asif style */}
-      <nav className="nav-floating">
+      {/* Mobile Menu Overlay */}
+      <div className={`nav-mobile ${open ? 'nav-mobile--open' : ''}`}>
+        <div className="nav-mobile__content">
+          <div className="nav-mobile__links">
+            {navLinks.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                className={`nav-mobile__link ${active === id ? 'nav-mobile__link--active' : ''}`}
+                onClick={() => scrollTo(id)}
+              >
+                <Icon size={24} />
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="nav-mobile__footer">
+            <div className="nav-mobile__actions">
+              <a href="/gallery" className="nav__action-pill" onClick={() => setOpen(false)}>
+                <FiImage size={15} />
+                <span>Gallery</span>
+              </a>
+              <a href="/articles" className="nav__action-pill" onClick={() => setOpen(false)}>
+                <FiBook size={15} />
+                <span>Article</span>
+              </a>
+            </div>
+            
+            <a href={resumeLink} target="_blank" rel="noopener noreferrer" className="nav__cta nav__cta--mobile" onClick={() => setOpen(false)}>
+              <FiDownload size={16} />
+              <span>Download Resume</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Floating center pill nav — Desktop only */}
+      <nav className="nav-floating desktop-only">
         <div className={`nav-floating__pill ${open ? 'nav-floating__pill--open' : ''}`}>
           {navLinks.map(({ id, label, icon: Icon }) => (
             <button
@@ -118,11 +164,6 @@ export default function Navbar() {
             </button>
           ))}
         </div>
-
-        {/* Mobile toggle */}
-        <button className="nav-floating__toggle" onClick={() => setOpen(!open)} aria-label="Toggle menu">
-          {open ? <FiX size={20} /> : <FiMenu size={20} />}
-        </button>
       </nav>
     </>
   );
