@@ -1253,14 +1253,45 @@ function ArticleForm({ item, onSave }) {
             onChange={(content) => set('content', content)} 
             placeholder="Tell your story... (অভ্র ব্যবহার করে অনায়াসে বাংলায় টাইপ করুন)"
             modules={{
-              toolbar: [
-                [{ 'header': [1, 2, 3, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                ['blockquote', 'code-block'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                [{ 'align': [] }],
-                ['link', 'image', 'clean']
-              ]
+              toolbar: {
+                container: [
+                  [{ 'header': [1, 2, 3, false] }],
+                  ['bold', 'italic', 'underline', 'strike'],
+                  ['blockquote', 'code-block'],
+                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                  [{ 'align': [] }],
+                  ['link', 'image', 'clean']
+                ],
+                handlers: {
+                  image: function() {
+                    const input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/*');
+                    input.click();
+                    input.onchange = async () => {
+                      const file = input.files[0];
+                      if (!file) return;
+                      
+                      const fd = new FormData();
+                      fd.append('image', file);
+                      
+                      // Save current cursor state
+                      const range = this.quill.getSelection(true);
+                      
+                      try {
+                        const res = await uploadFile(fd);
+                        const url = res.data.url;
+                        
+                        this.quill.insertEmbed(range.index, 'image', getImageUrl(url));
+                        this.quill.setSelection(range.index + 1);
+                      } catch (err) {
+                        alert('Image upload failed: ' + (err.response?.data?.message || err.message));
+                        console.error(err);
+                      }
+                    };
+                  }
+                }
+              }
             }}
           />
         </div>
