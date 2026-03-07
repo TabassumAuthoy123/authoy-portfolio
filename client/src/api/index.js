@@ -25,6 +25,9 @@ export const sendMessage = (data) => api.post('/contact', data);
 // Auth
 export const login = (credentials) => api.post('/auth/login', credentials);
 export const verifyToken = () => api.post('/auth/verify');
+export const forgotPassword = (data) => api.post('/auth/forgot-password', data);
+export const verifyOTP = (data) => api.post('/auth/verify-otp', data);
+export const resetPassword = (data) => api.post('/auth/reset-password', data);
 
 // Admin CRUD
 export const createProject = (data) => api.post('/projects', data);
