@@ -108,7 +108,7 @@ export default function Navbar() {
               {theme === 'dark' ? <FiSun size={17} /> : <FiMoon size={17} />}
             </button>
             <button className="nav__mobile-toggle" onClick={() => setOpen(!open)}>
-              {open ? <FiX size={18} /> : <FiMenu size={18} />}
+              {open ? <FiX size={20} /> : <FiMenu size={20} />}
             </button>
           </div>
         </div>
