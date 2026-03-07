@@ -165,6 +165,21 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      {/* Floating center pill nav — Desktop only */}
+      <nav className="nav-floating desktop-only">
+        <div className={`nav-floating__pill ${open ? 'nav-floating__pill--open' : ''}`}>
+          {navLinks.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              className={`nav-floating__link ${active === id ? 'nav-floating__link--active' : ''}`}
+              onClick={() => scrollTo(id)}
+            >
+              <Icon size={14} />
+              {label}
+            </button>
+          ))}
+        </div>
+      </nav>
     </>
   );
 }
