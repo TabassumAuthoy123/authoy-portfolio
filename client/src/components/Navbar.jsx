@@ -102,14 +102,14 @@ export default function Navbar() {
 
           {/* Right — Desktop Actions */}
           <div className="nav__actions desktop-only">
-            <a href="/gallery" className="nav__action-pill">
+            <button className="nav__action-pill" onClick={() => navigate('/gallery')}>
               <FiImage size={15} />
               <span>Gallery</span>
-            </a>
-            <a href="/articles" className="nav__action-pill">
+            </button>
+            <button className="nav__action-pill" onClick={() => navigate('/articles')}>
               <FiBook size={15} />
               <span>Article</span>
-            </a>
+            </button>
             <button className="nav__action-icon" onClick={toggleTheme} aria-label="Toggle theme">
               {theme === 'dark' ? <FiSun size={17} /> : <FiMoon size={17} />}
             </button>
@@ -149,14 +149,14 @@ export default function Navbar() {
 
           <div className="nav-mobile__footer">
             <div className="nav-mobile__actions">
-              <a href="/gallery" className="nav__action-pill" onClick={() => setOpen(false)}>
+              <button className="nav__action-pill" onClick={() => { navigate('/gallery'); setOpen(false); }}>
                 <FiImage size={15} />
                 <span>Gallery</span>
-              </a>
-              <a href="/articles" className="nav__action-pill" onClick={() => setOpen(false)}>
+              </button>
+              <button className="nav__action-pill" onClick={() => { navigate('/articles'); setOpen(false); }}>
                 <FiBook size={15} />
                 <span>Article</span>
-              </a>
+              </button>
             </div>
             <a href={resumeLink} target="_blank" rel="noopener noreferrer" className="btn nav__cta--mobile">
               <FiDownload size={15} />
