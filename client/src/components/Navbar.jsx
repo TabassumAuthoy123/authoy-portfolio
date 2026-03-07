@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FiMenu, FiX, FiSun, FiMoon, FiDownload, FiImage, FiBook, FiHome, FiUser, FiZap, FiFolder, FiMap, FiAward, FiMail } from 'react-icons/fi';
 import { getProfile, getImageUrl } from '../api';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const navLinks = [
   { id: 'hero', label: 'Home', icon: FiHome },
@@ -16,6 +17,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('hero');
+  const location = useLocation();
+  const navigate = useNavigate();
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') || 'dark';
@@ -60,10 +63,21 @@ export default function Navbar() {
   }, []);
 
   const scrollTo = (id) => {
-    if (id === 'hero') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (location.pathname !== '/') {
+      navigate(id === 'hero' ? '/' : `/#${id}`);
+      if (id === 'hero') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        setTimeout(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
     } else {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      if (id === 'hero') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      }
     }
     setOpen(false);
   };
@@ -78,10 +92,13 @@ export default function Navbar() {
       <div className={`nav-top ${scrolled ? 'nav-top--scrolled' : ''}`}>
         <div className="nav-top__inner">
           {/* Left — Logo */}
-          <a href="#" className="nav__logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <button className="nav__logo" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => {
+            if (location.pathname !== '/') navigate('/');
+            else window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}>
             <span className="nav__logo-icon">✦</span>
             <span className="nav__logo-text">Adnan</span>
-          </a>
+          </button>
 
           {/* Right — Desktop Actions */}
           <div className="nav__actions desktop-only">
@@ -141,30 +158,13 @@ export default function Navbar() {
                 <span>Article</span>
               </a>
             </div>
-            
-            <a href={resumeLink} target="_blank" rel="noopener noreferrer" className="nav__cta nav__cta--mobile" onClick={() => setOpen(false)}>
-              <FiDownload size={16} />
+            <a href={resumeLink} target="_blank" rel="noopener noreferrer" className="btn nav__cta--mobile">
+              <FiDownload size={15} />
               <span>Download Resume</span>
             </a>
           </div>
         </div>
       </div>
-
-      {/* Floating center pill nav — Desktop only */}
-      <nav className="nav-floating desktop-only">
-        <div className={`nav-floating__pill ${open ? 'nav-floating__pill--open' : ''}`}>
-          {navLinks.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              className={`nav-floating__link ${active === id ? 'nav-floating__link--active' : ''}`}
-              onClick={() => scrollTo(id)}
-            >
-              <Icon size={14} />
-              {label}
-            </button>
-          ))}
-        </div>
-      </nav>
     </>
   );
 }
