@@ -6352,10 +6352,10 @@ img {
 .desktop-only { display: flex !important; }
 .mobile-only { display: none !important; }
 .nav__mobile-controls { gap: 15px; align-items: center; }
-.nav__mobile-toggle { width: 34px; height: 34px; border-radius: 8px; background: rgba(150, 150, 150, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(150, 150, 150, 0.2); color: hsl(var(--fg)); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
-[data-theme="dark"] .nav__mobile-toggle { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.1); color: #fff; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
-.nav__mobile-toggle:hover { background: rgba(150, 150, 150, 0.25); transform: scale(1.05); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); }
-[data-theme="dark"] .nav__mobile-toggle:hover { background: rgba(255, 255, 255, 0.1); }
+.nav__mobile-toggle { width: 30px; height: 30px; background: transparent; border: none; color: hsl(var(--fg)); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; padding: 0; margin-left: 5px; }
+[data-theme="dark"] .nav__mobile-toggle { background: transparent; border: none; color: #fff; box-shadow: none; }
+.nav__mobile-toggle:hover { opacity: 0.7; transform: scale(0.95); background: transparent; box-shadow: none; }
+[data-theme="dark"] .nav__mobile-toggle:hover { background: transparent; opacity: 0.7; }
 .nav-mobile { position: fixed; top: 80px; right: 20px; width: 280px; height: auto; padding: 25px; border-radius: 20px; background: rgba(245, 245, 245, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(150, 150, 150, 0.2); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); z-index: 998; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; transform: translateY(-20px) scale(0.95); transform-origin: top right; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
 [data-theme="dark"] .nav-mobile { background: rgba(20, 25, 35, 0.85); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); border-color: rgba(255, 255, 255, 0.05); }
 .nav-mobile--open { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
