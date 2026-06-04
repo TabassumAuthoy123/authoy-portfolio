@@ -15,8 +15,8 @@ const app = express();
 // Middleware
 const allowedOrigins = [
   process.env.CLIENT_URL,
-  'https://adnanmitul.me',
-  'https://www.adnanmitul.me',
+  'https://tabassumauthoy.me',
+  'https://www.tabassumauthoy.me',
   'http://localhost:5173'
 ].filter(Boolean);
 

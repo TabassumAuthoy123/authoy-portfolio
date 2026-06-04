@@ -723,7 +723,7 @@ function ProfileTab({ profile, onSave }) {
           <div className="ta-form-row">
             <div className="ta-form-group">
               <label className="ta-form-label">Full Name</label>
-              <input className="ta-form-input" placeholder="Adnan Kader Mitul" value={form.name} onChange={e => set('name', e.target.value)} />
+              <input className="ta-form-input" placeholder="Tabassum Authoy" value={form.name} onChange={e => set('name', e.target.value)} />
             </div>
             <div className="ta-form-group">
               <label className="ta-form-label">Title / Role</label>

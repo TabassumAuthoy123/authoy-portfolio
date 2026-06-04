@@ -7,14 +7,14 @@ import { TypeAnimation } from 'react-type-animation';
 
 // Fallback data — shown while loading or if API is down
 const FALLBACK = {
-  name: 'Adnan Kader Mitul',
-  title: 'Project Coordinator Intern | Problem Solver|Programmer',
-  tagline: 'Connecting Business with Technology.',
-  currentLearning: 'React Native',
-  githubUrl: 'https://github.com/adnan-mitul',
-  linkedinUrl: 'https://linkedin.com/in/adnan-kader-miul',
-  floatingTags: ['UI Magic', 'Clean Code', 'Innovation'],
-  yearsOfExperience: 2,
+  name: 'Tabassum Authoy',
+  title: 'Creative Developer & Designer | Problem Solver',
+  tagline: 'Building digital experiences that inspire.',
+  currentLearning: 'React & Next.js',
+  githubUrl: 'https://github.com/TabassumAuthoy123',
+  linkedinUrl: 'https://linkedin.com/in/tabassum-authoy',
+  floatingTags: ['UI/UX Magic', 'Clean Code', 'Innovation'],
+  yearsOfExperience: 3,
 };
 
 export default function Hero() {

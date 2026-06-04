@@ -9,28 +9,28 @@ dotenv.config({ path: '../.env' });
 const Profile = require('./models/Profile');
 
 const profileData = {
-  name: 'Adnan Kader Mitul',
-  title: 'Project Coordinator Intern',
-  tagline: 'Delivering scalable technology solutions with problem-solving at the core.',
-  email: 'adnankmitul@gmail.com',
-  phone: '+880 1305 900658',
+  name: 'Tabassum Authoy',
+  title: 'Creative Developer & Designer',
+  tagline: 'Building digital experiences that inspire.',
+  email: 'authoy@email.com',
+  phone: '+880 1XXX-XXXXXX',
   location: 'Dhaka, Bangladesh',
   bio: [
-    "I'm a 3rd-year Computer Science student at Ahsanullah University of Science and Technology, currently working as an Intern Software Engineer at Softify BD Ltd. My journey in tech started with competitive programming — solving 400+ problems across Codeforces, AtCoder, CodeChef, and LeetCode.",
-    "This sharpened my algorithmic thinking and problem-solving skills, which I now apply to building real-world applications. I work with React, Laravel, Express, Node.js, MongoDB, MySQL, Docker, and Redux to craft full-stack solutions that make a difference.",
-    "Beyond coding, I lead as Head of Administration at AUST Programming and Informatics Club, coordinating large-scale events like AUST IUPC 2025 and Job Fair 2025. I believe in building not just software, but communities that inspire growth."
+    "I'm a creative developer and designer based in Bangladesh, passionate about building beautiful and functional web experiences.",
+    "I specialize in front-end development and UI/UX design, combining aesthetics with performance to deliver products that users love.",
+    "I work with HTML5, CSS3, JavaScript, React, Next.js, and Node.js to craft elegant digital experiences that inspire."
   ],
-  quote: "The best code I've ever written wasn't about choosing the right framework — it was about truly understanding the problem first.",
-  photoUrl: '/WhatsApp Image 2026-02-24 at 9.28.02 PM.jpeg',
-  resumeUrl: '/Adnan%20Kader%20Mitul%20-CV.pdf',
-  githubUrl: 'https://github.com/adnan-mitul',
-  linkedinUrl: 'https://linkedin.com/in/adnan-kader-mitul',
-  floatingTags: ['UI Magic', 'Clean Code', 'Innovation'],
+  quote: "I craft elegant digital experiences with clean code and thoughtful design. Turning complex ideas into beautiful, intuitive interfaces.",
+  photoUrl: '/placeholder-avatar.png',
+  resumeUrl: '/Tabassum%20Authoy%20-CV.pdf',
+  githubUrl: 'https://github.com/TabassumAuthoy123',
+  linkedinUrl: 'https://linkedin.com/in/tabassum-authoy',
+  floatingTags: ['UI/UX Magic', 'Clean Code', 'Innovation'],
   stats: [
-    { icon: '💼', value: '3rd Year', label: 'CSE at AUST' },
-    { icon: '💻', value: '400+', label: 'Problems Solved' },
-    { icon: '🏆', value: 'Head', label: 'APIC Admin' },
-    { icon: '🚀', value: 'Intern', label: 'Softify BD' }
+    { icon: '💼', value: '3+ Years', label: 'Experience' },
+    { icon: '💻', value: '25+', label: 'Projects' },
+    { icon: '🏆', value: '15+', label: 'Happy Clients' },
+    { icon: '🚀', value: 'Available', label: 'For Freelance' }
   ]
 };
 

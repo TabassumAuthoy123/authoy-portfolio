@@ -25,7 +25,7 @@ export default function Navbar() {
     }
     return 'dark';
   });
-  const [resumeLink, setResumeLink] = useState('/Adnan%20Kader%20Mitul%20-CV.pdf');
+  const [resumeLink, setResumeLink] = useState('/Tabassum%20Authoy%20-CV.pdf');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -97,7 +97,7 @@ export default function Navbar() {
             else window.scrollTo({ top: 0, behavior: 'smooth' });
           }}>
             <span className="nav__logo-icon">✦</span>
-            <span className="nav__logo-text">Adnan</span>
+            <span className="nav__logo-text">Authoy</span>
           </button>
 
           {/* Right — Desktop Actions */}

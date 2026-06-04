@@ -7,10 +7,10 @@ import {
 
 const FALLBACK_PROFILE = {
   location: 'Dhaka, Bangladesh',
-  email: 'adnankmitul@gmail.com',
-  phone: '+880 1305 900658',
-  githubUrl: 'https://github.com/adnan-mitul',
-  linkedinUrl: 'https://linkedin.com/in/adnan-kader-mitul'
+  email: 'authoy@email.com',
+  phone: '+880 1XXX-XXXXXX',
+  githubUrl: 'https://github.com/TabassumAuthoy123',
+  linkedinUrl: 'https://linkedin.com/in/tabassum-authoy'
 };
 
 export default function Contact() {

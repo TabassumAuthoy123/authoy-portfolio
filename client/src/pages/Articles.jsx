@@ -90,7 +90,7 @@ export default function Articles() {
                       {/* Author Meta */}
                       <div className="article-card__meta-author">
                         <img src="/WhatsApp Image 2026-02-24 at 9.28.02 PM.jpeg" alt="Author" />
-                        <span>Adnan Kader Mitul</span>
+                        <span>Tabassum Authoy</span>
                       </div>
 
                       <h3 className="article-card__title--medium">{article.title}</h3>

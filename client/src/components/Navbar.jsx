@@ -25,7 +25,7 @@ export default function Navbar() {
     }
     return 'dark';
   });
-  const [resumeLink, setResumeLink] = useState('/Adnan%20Kader%20Mitul%20-CV.pdf');
+  const [resumeLink, setResumeLink] = useState('/Tabassum%20Authoy%20-CV.pdf');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -113,7 +113,7 @@ export default function Navbar() {
             }}
           >
             <span className="nav__logo-icon">✦</span>
-            <span className="nav__logo-text">Adnan</span>
+            <span className="nav__logo-text">Authoy</span>
           </button>
 
           {/* Right — Actions (Desktop Only pills) */}

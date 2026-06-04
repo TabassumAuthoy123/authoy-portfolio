@@ -70,7 +70,7 @@ export default function ArticleDetail() {
               <img src="/WhatsApp Image 2026-02-24 at 9.28.02 PM.jpeg" alt="Author" className="article-detail__author-avatar" />
               
               <div className="article-detail__author-info">
-                <h4>Adnan Kader Mitul</h4>
+                <h4>Tabassum Authoy</h4>
                 <div className="article-detail__author-meta">
                   <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                     {article.readTime} read

@@ -12,7 +12,7 @@ mongoose.connect(uri)
 
       if (count > 0) {
         await adminCollection.updateMany({}, { 
-          $set: { email: 'adnankmitul@gmail.com' },
+          $set: { email: 'authoy@email.com' },
           $unset: { username: "" } 
         });
         console.log('Forcefully updated email for admins');
@@ -21,7 +21,7 @@ mongoose.connect(uri)
         const salt = await bcrypt.genSalt(10);
         const password = await bcrypt.hash('admin', salt);
         await adminCollection.insertOne({
-          email: 'adnankmitul@gmail.com',
+          email: 'authoy@email.com',
           password: password,
           createdAt: new Date(),
           updatedAt: new Date()

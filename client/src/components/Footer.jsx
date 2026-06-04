@@ -12,10 +12,10 @@ const quickLinks = [
 ];
 
 const socials = [
-  { icon: <FiGithub size={18} />, label: 'GitHub', url: 'https://github.com/adnan-mitul' },
-  { icon: <FiLinkedin size={18} />, label: 'LinkedIn', url: 'https://linkedin.com/in/adnan-kader-mitul' },
-  { icon: <FaFacebook size={18} />, label: 'Facebook', url: 'https://facebook.com/adnankadermitul' },
-  { icon: <FiMail size={18} />, label: 'Email', url: 'mailto:adnankmitul@gmail.com' },
+  { icon: <FiGithub size={18} />, label: 'GitHub', url: 'https://github.com/TabassumAuthoy123' },
+  { icon: <FiLinkedin size={18} />, label: 'LinkedIn', url: 'https://linkedin.com/in/tabassum-authoy' },
+  { icon: <FaFacebook size={18} />, label: 'Facebook', url: 'https://facebook.com/tabassumauthoy' },
+  { icon: <FiMail size={18} />, label: 'Email', url: 'mailto:authoy@email.com' },
 ];
 
 export default function Footer() {
@@ -35,10 +35,10 @@ export default function Footer() {
                 <FiStar size={18} />
               </div>
               <span className="ft__brand-name">
-                Adnan <span className="ft__brand-highlight">Mitul</span>
+                Tabassum <span className="ft__brand-highlight">Authoy</span>
               </span>
             </div>
-            <p className="ft__role">Software Engineer & Competitive Programmer</p>
+            <p className="ft__role">Creative Developer & Designer</p>
             <p className="ft__desc">
               Full Stack Developer focused on building efficient, scalable web
               solutions. Passionate about clean code and problem-solving.
@@ -106,7 +106,7 @@ export default function Footer() {
 
         {/* ── Bottom Bar ── */}
         <div className="ft__bottom">
-          <span className="ft__bottom-left">Made by Adnan Kader Mitul</span>
+          <span className="ft__bottom-left">Made by Tabassum Authoy</span>
           <span className="ft__bottom-center">© 2025 All rights reserved.</span>
           <button className="ft__back-top" onClick={scrollToTop} aria-label="Back to top">
             <FiArrowUp size={16} />
