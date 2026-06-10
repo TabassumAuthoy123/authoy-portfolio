@@ -139,9 +139,14 @@ export default function Footer() {
                 tech explorations. Reach out to connect or collaborate.
               </p>
             </div>
-            <a href="#contact" className="ft__cta">
-              <FiMessageCircle size={16} /> Get in Touch
-            </a>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <a href="#contact" className="ft__cta" style={{ margin: 0 }}>
+                <FiMessageCircle size={16} /> Get in Touch
+              </a>
+              <a href="/client-portal" className="ft__cta" style={{ margin: 0, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                B2B Portal
+              </a>
+            </div>
           </div>
         </div>
 

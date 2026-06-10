@@ -28,6 +28,17 @@ A **commercial-grade, production-ready** portfolio CMS with full CRUD, admin pan
 
 ---
 
+## ═══════════════════════════════════════
+##   🏢 B2B CLIENT PORTAL
+## ═══════════════════════════════════════
+
+| Field    | Value                                            |
+|----------|--------------------------------------------------|
+| **URL**  | `https://your-domain.com/client-portal` or `http://localhost:5173/client-portal` |
+| **Auth** | Sign in using a generated B2B Client API Key (e.g. `pk_...` created in the Admin Panel) |
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
