@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './Admin.css';
 import {
   FiPlus, FiEdit2, FiTrash2, FiLogOut, FiCheck, FiX,
   FiUser, FiBook, FiImage, FiGlobe, FiEye, FiEyeOff,
   FiSun, FiMoon, FiBox, FiBriefcase, FiAward, FiMessageSquare,
-  FiGrid, FiMenu, FiChevronLeft, FiArrowLeft, FiActivity
+  FiGrid, FiMenu, FiChevronLeft, FiActivity, FiSettings,
+  FiDownload, FiUpload, FiKey, FiLock, FiUsers, FiSearch,
+  FiTrendingUp, FiClock, FiRefreshCw, FiDatabase, FiCopy,
+  FiExternalLink
 } from 'react-icons/fi';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -20,7 +23,12 @@ import {
   getProfile, updateProfile,
   getAllArticles, createArticle, updateArticle, deleteArticle,
   getGalleryItems, createGalleryItem, updateGalleryItem, deleteGalleryItem,
-  uploadFile, getImageUrl
+  uploadFile, getImageUrl,
+  getDashboardAnalytics, getActivityLog, logActivity,
+  getSettings, updateSettings,
+  exportBackup, importBackup,
+  changePassword,
+  getClients, createClient, updateClient, deleteClient, regenerateClientKey,
 } from '../api';
 
 /* ═══════════════════════════════════════
@@ -40,6 +48,8 @@ export default function Admin() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [notification, setNotification] = useState(null);
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') return localStorage.getItem('theme') || 'dark';
     return 'dark';
@@ -51,6 +61,11 @@ export default function Admin() {
   }, [theme]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+
+  const showNotif = useCallback((msg, type = 'success') => {
+    setNotification({ msg, type });
+    setTimeout(() => setNotification(null), 3000);
+  }, []);
 
   useEffect(() => {
     verifyToken()
@@ -93,12 +108,13 @@ export default function Admin() {
       else if (type === 'messages') await deleteMessage(id);
       else if (type === 'articles') await deleteArticle(id);
       else if (type === 'gallery') await deleteGalleryItem(id);
+      else if (type === 'clients') await deleteClient(id);
       
       setDeleteConfirm(null);
+      showNotif('Item deleted successfully');
       loadAll();
     } catch (err) {
-      console.error("Delete Error:", err);
-      alert('Failed to delete: ' + (err.response?.data?.message || err.message));
+      showNotif('Failed to delete: ' + (err.response?.data?.message || err.message), 'error');
       setDeleteConfirm(null);
     }
   };
@@ -106,12 +122,12 @@ export default function Admin() {
   const openCreate = () => { setEditItem(null); setShowModal(true); };
   const openEdit = (item) => { setEditItem(item); setShowModal(true); };
   const closeModal = () => { setShowModal(false); setEditItem(null); };
-  const afterSave = () => { closeModal(); loadAll(); };
+  const afterSave = (msg) => { closeModal(); loadAll(); showNotif(msg || 'Saved successfully'); };
 
   if (loading) return (
     <div className="ta-loading">
       <div className="ta-spinner" />
-      Loading admin panel...
+      <span>Loading admin panel...</span>
     </div>
   );
 
@@ -136,9 +152,18 @@ export default function Admin() {
       ],
     },
     {
+      title: 'BUSINESS',
+      items: [
+        { key: 'clients', label: 'Clients (B2B)', icon: <FiUsers /> },
+      ],
+    },
+    {
       title: 'SETTINGS',
       items: [
         { key: 'profile', label: 'Profile', icon: <FiUser /> },
+        { key: 'settings', label: 'Site Settings', icon: <FiSettings /> },
+        { key: 'security', label: 'Security', icon: <FiLock /> },
+        { key: 'backup', label: 'Backup', icon: <FiDatabase /> },
       ],
     },
   ];
@@ -146,8 +171,29 @@ export default function Admin() {
   const currentLabel = menuGroups.flatMap(g => g.items).find(i => i.key === tab)?.label || 'Dashboard';
   const unreadCount = data.messages.filter(m => !m.read).length;
 
+  // Filter helper for searchable tabs
+  const filterItems = (items, fields) => {
+    if (!searchQuery.trim()) return items;
+    const q = searchQuery.toLowerCase();
+    return items.filter(item =>
+      fields.some(field => {
+        const val = item[field];
+        if (Array.isArray(val)) return val.some(v => String(v).toLowerCase().includes(q));
+        return String(val || '').toLowerCase().includes(q);
+      })
+    );
+  };
+
   return (
     <div className="ta-admin">
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`ta-toast ta-toast--${notification.type}`}>
+          {notification.type === 'success' ? <FiCheck /> : <FiX />}
+          <span>{notification.msg}</span>
+        </div>
+      )}
+
       {/* Sidebar Overlay for mobile */}
       <div className={`ta-sidebar-overlay ${mobileOpen ? 'visible' : ''}`} onClick={() => setMobileOpen(false)} />
 
@@ -169,7 +215,7 @@ export default function Admin() {
                 <button
                   key={item.key}
                   className={`ta-sidebar__item ${tab === item.key ? 'active' : ''}`}
-                  onClick={() => { setShowModal(false); setEditItem(null); setMobileOpen(false); navigate(`/admin/${item.key}`); }}
+                  onClick={() => { setShowModal(false); setEditItem(null); setMobileOpen(false); setSearchQuery(''); navigate(`/admin/${item.key}`); }}
                   title={sidebarCollapsed ? item.label : undefined}
                 >
                   <span className="ta-sidebar__item-icon">{item.icon}</span>
@@ -207,6 +253,19 @@ export default function Admin() {
             </div>
           </div>
           <div className="ta-header__right">
+            {/* Global Search */}
+            {['projects', 'skills', 'experience', 'achievements', 'leadership', 'articles', 'gallery', 'messages', 'clients'].includes(tab) && (
+              <div className="ta-header__search">
+                <FiSearch size={14} />
+                <input
+                  type="text"
+                  placeholder={`Search ${currentLabel}...`}
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && <button onClick={() => setSearchQuery('')} className="ta-header__search-clear"><FiX size={12}/></button>}
+              </div>
+            )}
             <button className="ta-header__theme-btn" onClick={toggleTheme} aria-label="Toggle theme">
               {theme === 'dark' ? <FiSun size={18} /> : <FiMoon size={18} />}
             </button>
@@ -231,7 +290,33 @@ export default function Admin() {
 
           {/* ── PROFILE ── */}
           {tab === 'profile' && (
-            <ProfileTab profile={data.profile} onSave={loadAll} />
+            <ProfileTab profile={data.profile} onSave={loadAll} showNotif={showNotif} />
+          )}
+
+          {/* ── SITE SETTINGS ── */}
+          {tab === 'settings' && (
+            <SettingsTab showNotif={showNotif} />
+          )}
+
+          {/* ── SECURITY ── */}
+          {tab === 'security' && (
+            <SecurityTab showNotif={showNotif} />
+          )}
+
+          {/* ── BACKUP ── */}
+          {tab === 'backup' && (
+            <BackupTab showNotif={showNotif} />
+          )}
+
+          {/* ── CLIENTS (B2B) ── */}
+          {tab === 'clients' && (
+            <ClientsTab
+              searchQuery={searchQuery}
+              openCreate={openCreate}
+              openEdit={openEdit}
+              handleDelete={handleDelete}
+              showNotif={showNotif}
+            />
           )}
 
           {/* ── PROJECTS ── */}
@@ -241,7 +326,7 @@ export default function Admin() {
               onAdd={openCreate}
               headers={['Title', 'Tech Stack', 'Order', 'Actions']}
               emptyMsg="No projects yet"
-              rows={data.projects.map(item => (
+              rows={filterItems(data.projects, ['title', 'description', 'techStack']).map(item => (
                 <tr key={item._id}>
                   <td>
                     <div className="ta-table__title">{item.title}</div>
@@ -267,21 +352,22 @@ export default function Admin() {
 
           {/* ── SKILLS ── */}
           {tab === 'skills' && (() => {
+            const filtered = filterItems(data.skills, ['name', 'category']);
             const groupedSkills = ['frontend', 'backend', 'language', 'database', 'tool'].map(cat => ({
               category: cat,
-              items: data.skills.filter(s => s.category === cat).sort((a,b) => a.order - b.order)
+              items: filtered.filter(s => s.category === cat).sort((a,b) => a.order - b.order)
             }));
             return (
               <div className="ta-skills-admin">
                 <div className="ta-table-header" style={{ marginBottom: 20 }}>
-                  <h3>All Skills</h3>
+                  <h3>All Skills {searchQuery && <span style={{fontSize:'0.8rem',color:'var(--ta-text-secondary)'}}>({filtered.length} results)</span>}</h3>
                   <button className="ta-btn ta-btn--primary ta-btn--sm" onClick={openCreate}><FiPlus size={14} /> Add Skill</button>
                 </div>
-                {data.skills.length === 0 ? (
+                {filtered.length === 0 ? (
                   <div className="ta-empty">
                     <div className="ta-empty__icon">📋</div>
-                    <h4>No skills yet</h4>
-                    <p>Click "Add Skill" to create your first item.</p>
+                    <h4>{searchQuery ? 'No matching skills' : 'No skills yet'}</h4>
+                    <p>{searchQuery ? 'Try a different search term.' : 'Click "Add Skill" to create your first item.'}</p>
                   </div>
                 ) : (
                   <div className="ta-skills-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
@@ -316,7 +402,7 @@ export default function Admin() {
               onAdd={openCreate}
               headers={['Role', 'Company', 'Duration', 'Type', 'Actions']}
               emptyMsg="No experience entries yet"
-              rows={data.experience.map(item => (
+              rows={filterItems(data.experience, ['role', 'company', 'duration']).map(item => (
                 <tr key={item._id}>
                   <td><span className="ta-table__title">{item.role}</span></td>
                   <td>{item.company}</td>
@@ -340,7 +426,7 @@ export default function Admin() {
               onAdd={openCreate}
               headers={['Title', 'Category', 'Date', 'Actions']}
               emptyMsg="No achievements yet"
-              rows={data.achievements.map(item => (
+              rows={filterItems(data.achievements, ['title', 'description', 'category']).map(item => (
                 <tr key={item._id}>
                   <td>
                     <div className="ta-table__title">{item.title}</div>
@@ -359,14 +445,14 @@ export default function Admin() {
             />
           )}
 
-          {/* ── LEADERSHIP & ACTIVITIES ── */}
+          {/* ── LEADERSHIP ── */}
           {tab === 'leadership' && (
             <DataTableSection
               title="Leadership & Activities"
               onAdd={openCreate}
               headers={['Title / Role', 'Organization', 'Date', 'Actions']}
               emptyMsg="No leadership items yet"
-              rows={data.leadership.map(item => (
+              rows={filterItems(data.leadership, ['title', 'role', 'organization']).map(item => (
                 <tr key={item._id}>
                   <td>
                     <div className="ta-table__title">{item.title}</div>
@@ -397,7 +483,7 @@ export default function Admin() {
               onAdd={openCreate}
               headers={['Title', 'Category', 'Status', 'Read Time', 'Actions']}
               emptyMsg="No articles yet"
-              rows={data.articles.map(item => (
+              rows={filterItems(data.articles, ['title', 'excerpt', 'category']).map(item => (
                 <tr key={item._id}>
                   <td>
                     <div className="ta-table__title">{item.title}</div>
@@ -437,7 +523,7 @@ export default function Admin() {
                 </div>
               ) : (
                 <div className="ta-gallery-grid" style={{ marginTop: 20 }}>
-                  {data.gallery.map(item => (
+                  {filterItems(data.gallery, ['title', 'category', 'description']).map(item => (
                     <div className="ta-gallery-card" key={item._id}>
                       {item.imageUrl && <img src={getImageUrl(item.imageUrl)} alt={item.title} className="ta-gallery-card__img" />}
                       <div className="ta-gallery-card__body">
@@ -483,7 +569,7 @@ export default function Admin() {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.messages.map(item => (
+                    {filterItems(data.messages, ['name', 'email', 'message']).map(item => (
                       <tr key={item._id} className={!item.read ? 'unread' : ''}>
                         <td>
                           <div className="ta-table__title">{item.name}</div>
@@ -516,11 +602,11 @@ export default function Admin() {
       </div>
 
       {/* ── MODAL ── */}
-      {showModal && tab !== 'profile' && tab !== 'dashboard' && (
+      {showModal && !['profile', 'dashboard', 'settings', 'security', 'backup'].includes(tab) && (
         <div className="ta-modal-overlay" onClick={closeModal}>
           <div className="ta-modal" onClick={e => e.stopPropagation()}>
             <div className="ta-modal__header">
-              <h3>{editItem ? 'Edit' : 'Create'} {currentLabel.replace(/s$/, '')}</h3>
+              <h3>{editItem ? 'Edit' : 'Create'} {currentLabel.replace(/s$/, '').replace(' (B2B)', '')}</h3>
               <button className="ta-modal__close" onClick={closeModal}><FiX size={18} /></button>
             </div>
             <div className="ta-modal__body">
@@ -531,6 +617,7 @@ export default function Admin() {
               {tab === 'leadership' && <LeadershipForm item={editItem} onSave={afterSave} />}
               {tab === 'articles' && <ArticleForm item={editItem} onSave={afterSave} />}
               {tab === 'gallery' && <GalleryForm item={editItem} onSave={afterSave} />}
+              {tab === 'clients' && <ClientForm item={editItem} onSave={afterSave} />}
             </div>
           </div>
         </div>
@@ -548,7 +635,7 @@ export default function Admin() {
               <p style={{ margin: 0, color: 'var(--ta-text-secondary)' }}>Are you sure you want to delete this item? This action cannot be undone.</p>
               <div style={{ display: 'flex', gap: '10px', marginTop: '24px', justifyContent: 'flex-end' }}>
                 <button className="ta-btn" onClick={() => setDeleteConfirm(null)} style={{ background: 'transparent', border: '1px solid var(--ta-border)' }}>Cancel</button>
-                <button className="ta-btn ta-btn--primary" style={{ background: 'var(--ta-accent)', borderColor: 'var(--ta-accent)', color: '#fff' }} onClick={() => executeDelete(deleteConfirm.type, deleteConfirm.id)}>Delete</button>
+                <button className="ta-btn ta-btn--primary" style={{ background: '#ef4444', borderColor: '#ef4444', color: '#fff' }} onClick={() => executeDelete(deleteConfirm.type, deleteConfirm.id)}>Delete</button>
               </div>
             </div>
           </div>
@@ -560,9 +647,17 @@ export default function Admin() {
 
 
 /* ═══════════════════════════════════════
-   DASHBOARD TAB
+   DASHBOARD TAB (Enhanced with Analytics)
    ═══════════════════════════════════════ */
 function DashboardTab({ data, navigate, unreadCount }) {
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    getDashboardAnalytics()
+      .then(res => setAnalytics(res.data))
+      .catch(() => {});
+  }, []);
+
   const stats = [
     { label: 'Total Projects', value: data.projects.length, icon: <FiGlobe />, color: 'primary', tab: 'projects' },
     { label: 'Total Skills', value: data.skills.length, icon: <FiBox />, color: 'success', tab: 'skills' },
@@ -574,8 +669,15 @@ function DashboardTab({ data, navigate, unreadCount }) {
     { label: 'Leadership', value: data.leadership.length, icon: <FiActivity />, color: 'info', tab: 'leadership' },
   ];
 
+  const actionIcons = {
+    create: '✨', update: '✏️', delete: '🗑️', login: '🔐',
+    logout: '🚪', password_change: '🔒', settings_update: '⚙️',
+    backup: '💾', restore: '📥',
+  };
+
   return (
     <>
+      {/* Stats Grid */}
       <div className="ta-stats">
         {stats.map(s => (
           <div className="ta-stat-card" key={s.label} onClick={() => navigate(`/admin/${s.tab}`)} style={{ cursor: 'pointer' }}>
@@ -587,6 +689,52 @@ function DashboardTab({ data, navigate, unreadCount }) {
           </div>
         ))}
       </div>
+
+      {/* Quick Actions */}
+      <div className="ta-table-wrapper" style={{ marginTop: 8 }}>
+        <div className="ta-table-header">
+          <h3>⚡ Quick Actions</h3>
+        </div>
+        <div style={{ padding: '16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+          {[
+            { label: 'Add Project', icon: <FiGlobe />, tab: 'projects' },
+            { label: 'Write Article', icon: <FiBook />, tab: 'articles' },
+            { label: 'Upload Gallery', icon: <FiImage />, tab: 'gallery' },
+            { label: 'View Messages', icon: <FiMessageSquare />, tab: 'messages' },
+            { label: 'Site Settings', icon: <FiSettings />, tab: 'settings' },
+            { label: 'Export Backup', icon: <FiDownload />, tab: 'backup' },
+          ].map(action => (
+            <button key={action.label} className="ta-btn ta-btn--ghost" onClick={() => navigate(`/admin/${action.tab}`)} style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start', padding: '12px 16px' }}>
+              {action.icon} {action.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      {analytics?.recentActivities?.length > 0 && (
+        <div className="ta-table-wrapper" style={{ marginTop: 8 }}>
+          <div className="ta-table-header">
+            <h3><FiClock size={16} style={{ marginRight: 6 }} /> Recent Activity</h3>
+          </div>
+          <div style={{ padding: '12px 16px' }}>
+            {analytics.recentActivities.slice(0, 8).map((act, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: '1px solid var(--ta-border)' }}>
+                <span style={{ fontSize: '1.2rem' }}>{actionIcons[act.action] || '📋'}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 500, color: 'var(--ta-text-primary)' }}>
+                    {act.action.charAt(0).toUpperCase() + act.action.slice(1)} — {act.resourceType}
+                  </div>
+                  {act.resourceTitle && <div style={{ fontSize: '0.78rem', color: 'var(--ta-text-secondary)' }}>{act.resourceTitle}</div>}
+                </div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--ta-text-secondary)', whiteSpace: 'nowrap' }}>
+                  {new Date(act.createdAt).toLocaleDateString()} {new Date(act.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recent Messages Table */}
       {data.messages.length > 0 && (
@@ -635,7 +783,7 @@ function DataTableSection({ title, onAdd, headers, rows, emptyMsg }) {
   return (
     <div className="ta-table-wrapper">
       <div className="ta-table-header">
-        <h3>{title}</h3>
+        <h3>{title} <span style={{ fontSize: '0.8rem', color: 'var(--ta-text-secondary)', fontWeight: 400 }}>({rows.length})</span></h3>
         <button className="ta-btn ta-btn--primary ta-btn--sm" onClick={onAdd}><FiPlus size={14} /> Add New</button>
       </div>
       {rows.length === 0 ? (
@@ -658,9 +806,331 @@ function DataTableSection({ title, onAdd, headers, rows, emptyMsg }) {
 
 
 /* ═══════════════════════════════════════
+   SETTINGS TAB
+   ═══════════════════════════════════════ */
+function SettingsTab({ showNotif }) {
+  const [settings, setSettings] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    getSettings().then(res => setSettings(res.data)).catch(() => setSettings({}));
+  }, []);
+
+  const set = (k, v) => setSettings(s => ({ ...s, [k]: v }));
+  const setNested = (parent, k, v) => setSettings(s => ({ ...s, [parent]: { ...s[parent], [k]: v } }));
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await updateSettings(settings);
+      showNotif('Settings saved successfully');
+    } catch (err) {
+      showNotif('Failed to save settings: ' + (err.response?.data?.message || err.message), 'error');
+    }
+    setSaving(false);
+  };
+
+  if (!settings) return <div className="ta-loading"><div className="ta-spinner" />Loading settings...</div>;
+
+  return (
+    <form onSubmit={handleSave}>
+      {/* SEO */}
+      <div className="ta-profile-section">
+        <div className="ta-profile-section__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3>🔍 SEO Settings</h3>
+          <button type="submit" className="ta-btn ta-btn--primary" disabled={saving} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
+            {saving ? 'Saving...' : 'Save Settings'}
+          </button>
+        </div>
+        <div className="ta-profile-section__body">
+          <div className="ta-form-group">
+            <label className="ta-form-label">Site Title</label>
+            <input className="ta-form-input" value={settings.siteTitle || ''} onChange={e => set('siteTitle', e.target.value)} placeholder="Portfolio CMS" />
+          </div>
+          <div className="ta-form-group">
+            <label className="ta-form-label">Meta Description</label>
+            <textarea className="ta-form-textarea" rows={3} value={settings.siteDescription || ''} onChange={e => set('siteDescription', e.target.value)} placeholder="A short description for search engines..." />
+          </div>
+          <div className="ta-form-group">
+            <label className="ta-form-label">Keywords (comma separated)</label>
+            <input className="ta-form-input" value={settings.siteKeywords || ''} onChange={e => set('siteKeywords', e.target.value)} placeholder="portfolio, developer, react" />
+          </div>
+          <div className="ta-form-group">
+            <label className="ta-form-label">Google Analytics ID</label>
+            <input className="ta-form-input" value={settings.googleAnalyticsId || ''} onChange={e => set('googleAnalyticsId', e.target.value)} placeholder="G-XXXXXXXXXX" />
+          </div>
+        </div>
+      </div>
+
+      {/* Branding */}
+      <div className="ta-profile-section">
+        <div className="ta-profile-section__header"><h3>🎨 Branding</h3></div>
+        <div className="ta-profile-section__body">
+          <div className="ta-form-row">
+            <div className="ta-form-group">
+              <label className="ta-form-label">Brand Name</label>
+              <input className="ta-form-input" value={settings.brandName || ''} onChange={e => set('brandName', e.target.value)} />
+            </div>
+            <div className="ta-form-group">
+              <label className="ta-form-label">Accent Color</label>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input type="color" value={settings.accentColor || '#2dd4bf'} onChange={e => set('accentColor', e.target.value)} style={{ width: 40, height: 35, border: 'none', cursor: 'pointer' }} />
+                <input className="ta-form-input" value={settings.accentColor || ''} onChange={e => set('accentColor', e.target.value)} style={{ flex: 1 }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Social Links */}
+      <div className="ta-profile-section">
+        <div className="ta-profile-section__header"><h3>🌐 Social Links</h3></div>
+        <div className="ta-profile-section__body">
+          {['github', 'linkedin', 'twitter', 'facebook', 'instagram', 'youtube'].map(platform => (
+            <div className="ta-form-group" key={platform}>
+              <label className="ta-form-label" style={{ textTransform: 'capitalize' }}>{platform}</label>
+              <input className="ta-form-input" value={settings.socialLinks?.[platform] || ''} onChange={e => setNested('socialLinks', platform, e.target.value)} placeholder={`https://${platform}.com/...`} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Feature Toggles */}
+      <div className="ta-profile-section">
+        <div className="ta-profile-section__header"><h3>🔧 Feature Toggles</h3></div>
+        <div className="ta-profile-section__body">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+            {[
+              { key: 'showArticles', label: 'Show Articles Section' },
+              { key: 'showGallery', label: 'Show Gallery Section' },
+              { key: 'showContact', label: 'Show Contact Form' },
+              { key: 'showNewsletter', label: 'Show Newsletter' },
+              { key: 'maintenanceMode', label: '⚠️ Maintenance Mode' },
+            ].map(toggle => (
+              <label key={toggle.key} className="ta-form-checkbox" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input type="checkbox" checked={settings.features?.[toggle.key] || false} onChange={e => setNested('features', toggle.key, e.target.checked)} />
+                <span>{toggle.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="ta-profile-section">
+        <div className="ta-profile-section__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3>📎 Footer</h3>
+          <button type="submit" className="ta-btn ta-btn--primary" disabled={saving} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
+            {saving ? 'Saving...' : 'Save All Settings'}
+          </button>
+        </div>
+        <div className="ta-profile-section__body">
+          <div className="ta-form-group">
+            <label className="ta-form-label">Footer Text</label>
+            <input className="ta-form-input" value={settings.footerText || ''} onChange={e => set('footerText', e.target.value)} />
+          </div>
+        </div>
+      </div>
+    </form>
+  );
+}
+
+
+/* ═══════════════════════════════════════
+   SECURITY TAB
+   ═══════════════════════════════════════ */
+function SecurityTab({ showNotif }) {
+  const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [saving, setSaving] = useState(false);
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (form.newPassword !== form.confirmPassword) {
+      return showNotif('New password and confirmation do not match', 'error');
+    }
+    if (form.newPassword.length < 8) {
+      return showNotif('Password must be at least 8 characters', 'error');
+    }
+    setSaving(true);
+    try {
+      await changePassword({ currentPassword: form.currentPassword, newPassword: form.newPassword });
+      showNotif('Password changed successfully');
+      setForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (err) {
+      showNotif(err.response?.data?.message || 'Failed to change password', 'error');
+    }
+    setSaving(false);
+  };
+
+  return (
+    <div className="ta-profile-section">
+      <div className="ta-profile-section__header"><h3>🔒 Change Password</h3></div>
+      <div className="ta-profile-section__body">
+        <form onSubmit={handleChangePassword} style={{ maxWidth: 400 }}>
+          <div className="ta-form-group">
+            <label className="ta-form-label">Current Password</label>
+            <input className="ta-form-input" type="password" value={form.currentPassword} onChange={e => setForm({...form, currentPassword: e.target.value})} required />
+          </div>
+          <div className="ta-form-group">
+            <label className="ta-form-label">New Password</label>
+            <input className="ta-form-input" type="password" value={form.newPassword} onChange={e => setForm({...form, newPassword: e.target.value})} required minLength={8} />
+            <span className="ta-form-hint">Minimum 8 characters</span>
+          </div>
+          <div className="ta-form-group">
+            <label className="ta-form-label">Confirm New Password</label>
+            <input className="ta-form-input" type="password" value={form.confirmPassword} onChange={e => setForm({...form, confirmPassword: e.target.value})} required />
+          </div>
+          <button type="submit" className="ta-btn ta-btn--primary" disabled={saving} style={{ marginTop: 8 }}>
+            <FiLock size={14} /> {saving ? 'Changing...' : 'Change Password'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+
+/* ═══════════════════════════════════════
+   BACKUP TAB
+   ═══════════════════════════════════════ */
+function BackupTab({ showNotif }) {
+  const [importing, setImporting] = useState(false);
+
+  const handleExport = async () => {
+    try {
+      const res = await exportBackup();
+      const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `portfolio-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showNotif('Backup exported successfully');
+    } catch (err) {
+      showNotif('Export failed: ' + (err.response?.data?.message || err.message), 'error');
+    }
+  };
+
+  const handleImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      await importBackup(data);
+      showNotif('Backup imported successfully! Refreshing data...');
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (err) {
+      showNotif('Import failed: ' + (err.response?.data?.message || err.message), 'error');
+    }
+    setImporting(false);
+  };
+
+  return (
+    <div style={{ display: 'grid', gap: '24px', maxWidth: 600 }}>
+      <div className="ta-profile-section">
+        <div className="ta-profile-section__header"><h3>💾 Export Backup</h3></div>
+        <div className="ta-profile-section__body">
+          <p style={{ color: 'var(--ta-text-secondary)', marginBottom: '16px' }}>
+            Download a complete JSON backup of all your portfolio data (projects, skills, experience, articles, gallery, etc.)
+          </p>
+          <button className="ta-btn ta-btn--primary" onClick={handleExport}>
+            <FiDownload size={14} /> Export Full Backup
+          </button>
+        </div>
+      </div>
+
+      <div className="ta-profile-section">
+        <div className="ta-profile-section__header"><h3>📥 Import Backup</h3></div>
+        <div className="ta-profile-section__body">
+          <p style={{ color: 'var(--ta-text-secondary)', marginBottom: '8px' }}>
+            Restore from a previously exported JSON backup file. <strong style={{ color: '#ef4444' }}>Warning: This will replace all existing data.</strong>
+          </p>
+          <div className="ta-file-upload" style={{ marginTop: '12px' }}>
+            <input type="file" accept=".json" onChange={handleImport} disabled={importing} />
+            {importing && <span style={{ fontSize: '0.82rem' }}>Importing...</span>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+/* ═══════════════════════════════════════
+   CLIENTS TAB (B2B)
+   ═══════════════════════════════════════ */
+function ClientsTab({ searchQuery, openCreate, openEdit, handleDelete, showNotif }) {
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadClients();
+  }, [searchQuery]);
+
+  const loadClients = async () => {
+    try {
+      const res = await getClients({ search: searchQuery || undefined });
+      setClients(res.data.clients || []);
+    } catch { setClients([]); }
+    setLoading(false);
+  };
+
+  const handleRegenKey = async (id) => {
+    if (!window.confirm('Regenerate API key? The old key will stop working immediately.')) return;
+    try {
+      const res = await regenerateClientKey(id);
+      showNotif('New API key generated');
+      loadClients();
+    } catch (err) {
+      showNotif('Failed to regenerate key', 'error');
+    }
+  };
+
+  const statusColors = { active: 'success', inactive: 'muted', suspended: 'danger', trial: 'warning' };
+  const planColors = { starter: 'info', professional: 'primary', enterprise: 'success' };
+
+  if (loading) return <div className="ta-loading"><div className="ta-spinner" />Loading clients...</div>;
+
+  return (
+    <DataTableSection
+      title="B2B Clients"
+      onAdd={openCreate}
+      headers={['Company', 'Contact', 'Plan', 'Status', 'Actions']}
+      emptyMsg="No clients yet — Add your first B2B client"
+      rows={clients.map(client => (
+        <tr key={client._id}>
+          <td>
+            <div className="ta-table__title">{client.companyName}</div>
+            <div className="ta-table__subtitle">{client.industry || 'No industry'}</div>
+          </td>
+          <td>
+            <div className="ta-table__title">{client.contactName || '—'}</div>
+            <div className="ta-table__subtitle">{client.contactEmail}</div>
+          </td>
+          <td><span className={`ta-badge ta-badge--${planColors[client.plan] || 'info'}`}>{client.plan}</span></td>
+          <td><span className={`ta-badge ta-badge--${statusColors[client.status] || 'info'}`}>{client.status}</span></td>
+          <td>
+            <div className="ta-actions">
+              <button className="ta-action-btn ta-action-btn--edit" onClick={() => openEdit(client)} title="Edit"><FiEdit2 size={14} /></button>
+              <button className="ta-action-btn" onClick={() => handleRegenKey(client._id)} title="Regenerate API Key" style={{ color: 'var(--ta-warning)' }}><FiKey size={14} /></button>
+              <button className="ta-action-btn ta-action-btn--delete" onClick={() => handleDelete('clients', client._id)} title="Delete"><FiTrash2 size={14} /></button>
+            </div>
+          </td>
+        </tr>
+      ))}
+    />
+  );
+}
+
+
+/* ═══════════════════════════════════════
    PROFILE TAB
    ═══════════════════════════════════════ */
-function ProfileTab({ profile, onSave }) {
+function ProfileTab({ profile, onSave, showNotif }) {
   const empty = {
     name: '', title: '', tagline: '', quote: '',
     email: '', phone: '', location: '',
@@ -676,7 +1146,6 @@ function ProfileTab({ profile, onSave }) {
 
   const [form, setForm] = useState(toForm(profile));
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   useEffect(() => { setForm(toForm(profile)); }, [profile]);
 
@@ -700,11 +1169,10 @@ function ProfileTab({ profile, onSave }) {
         stats: parseStats(form.stats),
       };
       await updateProfile(payload);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      showNotif('Profile saved successfully');
       onSave();
     } catch (err) {
-      alert('Failed to save profile: ' + (err.response?.data?.message || err.message));
+      showNotif('Failed to save profile: ' + (err.response?.data?.message || err.message), 'error');
     }
     setSaving(false);
   };
@@ -716,7 +1184,7 @@ function ProfileTab({ profile, onSave }) {
         <div className="ta-profile-section__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3>Personal Information</h3>
           <button type="submit" className="ta-btn ta-btn--primary" disabled={saving} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
-            {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save Info'}
+            {saving ? 'Saving...' : '💾 Save Profile'}
           </button>
         </div>
         <div className="ta-profile-section__body">
@@ -753,12 +1221,7 @@ function ProfileTab({ profile, onSave }) {
 
       {/* Links & Media */}
       <div className="ta-profile-section">
-        <div className="ta-profile-section__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3>Links & Media</h3>
-          <button type="submit" className="ta-btn ta-btn--primary" disabled={saving} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
-            {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save Media'}
-          </button>
-        </div>
+        <div className="ta-profile-section__header"><h3>Links & Media</h3></div>
         <div className="ta-profile-section__body">
           <div className="ta-form-group">
             <label className="ta-form-label">Photo</label>
@@ -781,7 +1244,7 @@ function ProfileTab({ profile, onSave }) {
                 <input type="file" accept="application/pdf" onChange={async (e) => {
                   const file = e.target.files[0];
                   if (!file) return;
-                  const fd = new FormData(); fd.append('image', file); // using 'image' field since backend upload.single('image') handles it
+                  const fd = new FormData(); fd.append('image', file);
                   try { const res = await uploadFile(fd); set('resumeUrl', res.data.url); } catch (err) { alert('Upload failed: ' + (err.response?.data?.message || err.message)); }
                 }} />
                 {form.resumeUrl && <span className="ta-file-status">✓ File Ready</span>}
@@ -802,12 +1265,7 @@ function ProfileTab({ profile, onSave }) {
 
       {/* About Section */}
       <div className="ta-profile-section">
-        <div className="ta-profile-section__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3>About Section</h3>
-          <button type="submit" className="ta-btn ta-btn--primary" disabled={saving} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
-            {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save About'}
-          </button>
-        </div>
+        <div className="ta-profile-section__header"><h3>About Section</h3></div>
         <div className="ta-profile-section__body">
           <div className="ta-form-group">
             <label className="ta-form-label">Quote</label>
@@ -825,7 +1283,7 @@ function ProfileTab({ profile, onSave }) {
         <div className="ta-profile-section__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3>Hero Floating Tags & Stats</h3>
           <button type="submit" className="ta-btn ta-btn--primary" disabled={saving} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
-            {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save Stats'}
+            {saving ? 'Saving...' : '💾 Save All'}
           </button>
         </div>
         <div className="ta-profile-section__body">
@@ -858,7 +1316,7 @@ function ProjectForm({ item, onSave }) {
       const payload = { ...form, techStack: typeof form.techStack === 'string' ? form.techStack.split(',').map(s => s.trim()) : form.techStack };
       if (item?._id) await updateProject(item._id, payload);
       else await createProject(payload);
-      onSave();
+      onSave(item?._id ? 'Project updated' : 'Project created');
     } catch (err) {
       alert('Failed to save project: ' + (err.response?.data?.message || err.message));
     }
@@ -930,7 +1388,7 @@ function SkillForm({ item, onSave }) {
     try {
       if (item?._id) await updateSkill(item._id, form);
       else await createSkill(form);
-      onSave();
+      onSave(item?._id ? 'Skill updated' : 'Skill created');
     } catch (err) {
       alert('Failed to save skill: ' + (err.response?.data?.message || err.message));
     }
@@ -972,7 +1430,7 @@ function ExperienceForm({ item, onSave }) {
       const payload = { ...form, description: typeof form.description === 'string' ? form.description.split('\n').filter(Boolean) : form.description };
       if (item?._id) await updateExperience(item._id, payload);
       else await createExperience(payload);
-      onSave();
+      onSave(item?._id ? 'Experience updated' : 'Experience created');
     } catch (err) {
       alert('Failed to save experience: ' + (err.response?.data?.message || err.message));
     }
@@ -1031,7 +1489,7 @@ function AchievementForm({ item, onSave }) {
     try {
       if (item?._id) await updateAchievement(item._id, form);
       else await createAchievement(form);
-      onSave();
+      onSave(item?._id ? 'Achievement updated' : 'Achievement created');
     } catch (err) {
       alert('Failed to save achievement: ' + (err.response?.data?.message || err.message));
     }
@@ -1073,9 +1531,7 @@ function AchievementForm({ item, onSave }) {
 }
 
 function LeadershipForm({ item, onSave }) {
-  const [form, setForm] = useState(item || {
-    title: '', organization: '', role: '', description: '', date: '', imageUrl: '', order: 0
-  });
+  const [form, setForm] = useState(item || { title: '', organization: '', role: '', description: '', date: '', imageUrl: '', order: 0 });
   const [uploading, setUploading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -1083,7 +1539,7 @@ function LeadershipForm({ item, onSave }) {
     try {
       if (item?._id) await updateLeadership(item._id, form);
       else await createLeadership(form);
-      onSave();
+      onSave(item?._id ? 'Leadership updated' : 'Leadership created');
     } catch (err) {
       alert('Failed to save leadership item: ' + (err.response?.data?.message || err.message));
     }
@@ -1107,7 +1563,7 @@ function LeadershipForm({ item, onSave }) {
       </div>
       <div className="ta-form-group">
         <label className="ta-form-label">Description</label>
-        <textarea className="ta-form-textarea" placeholder="Describe your responsibilities and impact..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
+        <textarea className="ta-form-textarea" placeholder="Describe your responsibilities..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
       </div>
       <div className="ta-form-group">
         <label className="ta-form-label">Date / Duration</label>
@@ -1126,9 +1582,7 @@ function LeadershipForm({ item, onSave }) {
           {uploading && <span style={{ fontSize: '0.82rem', color: 'var(--ta-text-secondary)' }}>Uploading...</span>}
           {form.imageUrl && <span className="ta-file-status">✓ Image Ready</span>}
         </div>
-        {!form.imageUrl && !uploading && (
-          <input className="ta-form-input" placeholder="Or enter Image URL" value={form.imageUrl} onChange={e => setForm({ ...form, imageUrl: e.target.value })} style={{ marginTop: 6 }} />
-        )}
+        {!form.imageUrl && !uploading && <input className="ta-form-input" placeholder="Or enter Image URL" value={form.imageUrl} onChange={e => setForm({ ...form, imageUrl: e.target.value })} style={{ marginTop: 6 }} />}
         {form.imageUrl && <img src={getImageUrl(form.imageUrl)} alt="preview" className="ta-img-preview" />}
       </div>
       <div className="ta-form-group">
@@ -1163,7 +1617,7 @@ function ArticleForm({ item, onSave }) {
     try {
       if (item?._id) await updateArticle(item._id, form);
       else await createArticle(form);
-      onSave();
+      onSave(item?._id ? 'Article updated' : 'Article published');
     } catch (err) {
       alert('Failed to save article: ' + (err.response?.data?.message || err.message));
     }
@@ -1251,7 +1705,7 @@ function ArticleForm({ item, onSave }) {
             theme="snow" 
             value={form.content} 
             onChange={(content) => set('content', content)} 
-            placeholder="Tell your story... (অভ্র ব্যবহার করে অনায়াসে বাংলায় টাইপ করুন)"
+            placeholder="Tell your story..."
             modules={{
               toolbar: {
                 container: [
@@ -1271,22 +1725,16 @@ function ArticleForm({ item, onSave }) {
                     input.onchange = async () => {
                       const file = input.files[0];
                       if (!file) return;
-                      
                       const fd = new FormData();
                       fd.append('image', file);
-                      
-                      // Save current cursor state
                       const range = this.quill.getSelection(true);
-                      
                       try {
                         const res = await uploadFile(fd);
                         const url = res.data.url;
-                        
                         this.quill.insertEmbed(range.index, 'image', getImageUrl(url));
                         this.quill.setSelection(range.index + 1);
                       } catch (err) {
                         alert('Image upload failed: ' + (err.response?.data?.message || err.message));
-                        console.error(err);
                       }
                     };
                   }
@@ -1310,17 +1758,14 @@ function ArticleForm({ item, onSave }) {
             <option value="career">Career</option>
           </select>
         </div>
-
         <div className="ta-form-group">
           <label className="ta-form-label">URL Slug</label>
           <input className="ta-form-input" placeholder="auto-generated-slug" value={form.slug} onChange={e => set('slug', e.target.value)} required />
         </div>
-
         <div className="ta-form-group">
           <label className="ta-form-label">Read Time</label>
           <input className="ta-form-input" placeholder="5 min" value={form.readTime} onChange={e => set('readTime', e.target.value)} />
         </div>
-
         <div className="ta-form-group">
           <label className="ta-form-label">Display Order</label>
           <input className="ta-form-input" type="number" value={form.order} onChange={e => set('order', Number(e.target.value))} />
@@ -1338,15 +1783,13 @@ function GalleryForm({ item, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Sync legacy imageUrl to the first image in imageUrls array for backward compatibility
       const submissionForm = { ...form };
       if (submissionForm.imageUrls && submissionForm.imageUrls.length > 0) {
         submissionForm.imageUrl = submissionForm.imageUrls[0];
       }
-      
       if (item?._id) await updateGalleryItem(item._id, submissionForm);
       else await createGalleryItem(submissionForm);
-      onSave();
+      onSave(item?._id ? 'Gallery item updated' : 'Gallery item created');
     } catch (err) {
       alert('Failed to save gallery item: ' + (err.response?.data?.message || err.message));
     }
@@ -1372,7 +1815,6 @@ function GalleryForm({ item, onSave }) {
                 const res = await uploadFile(fd); 
                 uploadedUrls.push(res.data.url);
               } catch (err) { 
-                console.error('Upload failed for file', file.name, err);
                 alert('Upload failed for ' + file.name); 
               }
             }
@@ -1382,10 +1824,8 @@ function GalleryForm({ item, onSave }) {
           {uploading && <span style={{ fontSize: '0.82rem', color: 'var(--ta-text-secondary)' }}>Uploading...</span>}
         </div>
         
-        {/* Previews for Multiple Images */}
         {(form.imageUrls && form.imageUrls.length > 0) || form.imageUrl ? (
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
-            {/* Display new array of images, or fallback to legacy single image if array is empty */}
             {(form.imageUrls?.length > 0 ? form.imageUrls : (form.imageUrl ? [form.imageUrl] : [])).map((url, i) => (
               <div key={i} style={{ position: 'relative' }}>
                 <img src={getImageUrl(url)} alt={`preview ${i}`} className="ta-img-preview" style={{ margin: 0 }} />
@@ -1425,6 +1865,101 @@ function GalleryForm({ item, onSave }) {
       </div>
       <div className="ta-modal__footer" style={{ padding: 0, border: 'none' }}>
         <button type="submit" className="ta-btn ta-btn--primary">{item?._id ? 'Update' : 'Create'}</button>
+      </div>
+    </form>
+  );
+}
+
+function ClientForm({ item, onSave }) {
+  const [form, setForm] = useState(item || {
+    companyName: '', contactName: '', contactEmail: '', contactPhone: '',
+    website: '', industry: '', plan: 'starter', status: 'trial',
+    notes: '', projectsDelivered: 0, totalRevenue: 0,
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (item?._id) await updateClient(item._id, form);
+      else await createClient(form);
+      onSave(item?._id ? 'Client updated' : 'Client created');
+    } catch (err) {
+      alert('Failed to save client: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  return (
+    <form className="ta-form" onSubmit={handleSubmit}>
+      <div className="ta-form-group">
+        <label className="ta-form-label">Company Name <span style={{ color: '#ef4444' }}>*</span></label>
+        <input className="ta-form-input" placeholder="Acme Corp" value={form.companyName} onChange={e => setForm({...form, companyName: e.target.value})} required />
+      </div>
+      <div className="ta-form-row">
+        <div className="ta-form-group">
+          <label className="ta-form-label">Contact Name</label>
+          <input className="ta-form-input" placeholder="John Doe" value={form.contactName} onChange={e => setForm({...form, contactName: e.target.value})} />
+        </div>
+        <div className="ta-form-group">
+          <label className="ta-form-label">Contact Email <span style={{ color: '#ef4444' }}>*</span></label>
+          <input className="ta-form-input" type="email" placeholder="john@acme.com" value={form.contactEmail} onChange={e => setForm({...form, contactEmail: e.target.value})} required />
+        </div>
+      </div>
+      <div className="ta-form-row">
+        <div className="ta-form-group">
+          <label className="ta-form-label">Phone</label>
+          <input className="ta-form-input" placeholder="+1 234 567 8900" value={form.contactPhone} onChange={e => setForm({...form, contactPhone: e.target.value})} />
+        </div>
+        <div className="ta-form-group">
+          <label className="ta-form-label">Website</label>
+          <input className="ta-form-input" placeholder="https://acme.com" value={form.website} onChange={e => setForm({...form, website: e.target.value})} />
+        </div>
+      </div>
+      <div className="ta-form-row">
+        <div className="ta-form-group">
+          <label className="ta-form-label">Industry</label>
+          <input className="ta-form-input" placeholder="e.g. SaaS, E-commerce" value={form.industry} onChange={e => setForm({...form, industry: e.target.value})} />
+        </div>
+        <div className="ta-form-group">
+          <label className="ta-form-label">Plan</label>
+          <select className="ta-form-select" value={form.plan} onChange={e => setForm({...form, plan: e.target.value})}>
+            <option value="starter">Starter</option>
+            <option value="professional">Professional</option>
+            <option value="enterprise">Enterprise</option>
+          </select>
+        </div>
+      </div>
+      <div className="ta-form-row">
+        <div className="ta-form-group">
+          <label className="ta-form-label">Status</label>
+          <select className="ta-form-select" value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
+            <option value="trial">Trial</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="suspended">Suspended</option>
+          </select>
+        </div>
+        <div className="ta-form-group">
+          <label className="ta-form-label">Projects Delivered</label>
+          <input className="ta-form-input" type="number" value={form.projectsDelivered} onChange={e => setForm({...form, projectsDelivered: Number(e.target.value)})} />
+        </div>
+      </div>
+      <div className="ta-form-group">
+        <label className="ta-form-label">Notes</label>
+        <textarea className="ta-form-textarea" placeholder="Internal notes about this client..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} rows={3} />
+      </div>
+      {item?.apiKey && (
+        <div className="ta-form-group">
+          <label className="ta-form-label">API Key</label>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <input className="ta-form-input" value={item.apiKey} readOnly style={{ fontFamily: 'monospace', fontSize: '0.82rem' }} />
+            <button type="button" className="ta-btn ta-btn--ghost" onClick={() => { navigator.clipboard.writeText(item.apiKey); }} title="Copy API Key">
+              <FiCopy size={14} />
+            </button>
+          </div>
+        </div>
+      )}
+      <div className="ta-modal__footer" style={{ padding: 0, border: 'none' }}>
+        <button type="submit" className="ta-btn ta-btn--primary">{item?._id ? 'Update Client' : 'Create Client'}</button>
       </div>
     </form>
   );

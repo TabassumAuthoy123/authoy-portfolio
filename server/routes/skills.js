@@ -1,6 +1,7 @@
 const express = require('express');
 const auth = require('../middleware/auth');
 const Skill = require('../models/Skill');
+const { validate, skillRules } = require('../middleware/validator');
 const router = express.Router();
 
 // GET /api/skills - public
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/skills - admin only
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, validate(skillRules), async (req, res) => {
   try {
     const skill = await Skill.create(req.body);
     res.status(201).json(skill);
@@ -24,7 +25,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // PUT /api/skills/:id - admin only
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, validate(skillRules), async (req, res) => {
   try {
     const skill = await Skill.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!skill) return res.status(404).json({ message: 'Skill not found' });

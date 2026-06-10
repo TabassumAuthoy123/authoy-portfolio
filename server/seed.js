@@ -23,10 +23,10 @@ const seedData = async () => {
 
     // Create admin
     await Admin.create({
-      username: 'admin',
-      password: 'admin123',
+      email: 'authoy@email.com',
+      password: 'AuthoyAdmin@2026!',
     });
-    console.log('Admin created (username: admin, password: admin123)');
+    console.log('Admin created (email: authoy@email.com, password: admin)');
 
     // Seed Projects
     await Project.insertMany([
@@ -181,7 +181,7 @@ const seedData = async () => {
     console.log('Achievements seeded');
 
     console.log('\n✅ All data seeded successfully!');
-    console.log('Admin credentials: username=admin, password=admin123');
+    console.log('Admin credentials: email=authoy@email.com, password=AuthoyAdmin@2026!');
   } catch (error) {
     console.error('Seed error:', error);
     throw error;

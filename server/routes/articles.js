@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Article = require('../models/Article');
 const auth = require('../middleware/auth');
+const { validate, articleRules } = require('../middleware/validator');
 
 // GET all published articles (public)
 router.get('/', async (req, res) => {
@@ -35,7 +36,7 @@ router.get('/:slug', async (req, res) => {
 });
 
 // POST create article (admin)
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, validate(articleRules), async (req, res) => {
   try {
     const article = new Article(req.body);
     await article.save();
@@ -46,7 +47,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // PUT update article (admin)
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, validate(articleRules), async (req, res) => {
   try {
     const article = await Article.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(article);

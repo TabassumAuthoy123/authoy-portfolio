@@ -4,6 +4,7 @@ import { getArticleBySlug, getImageUrl } from '../api';
 import { FiArrowLeft, FiClock, FiCalendar, FiShare2 } from 'react-icons/fi';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SEOHead from '../components/SEOHead';
 
 export default function ArticleDetail() {
   const { slug } = useParams();
@@ -53,6 +54,11 @@ export default function ArticleDetail() {
 
   return (
     <>
+      <SEOHead 
+        title={`${article.title} | Tabassum Authoy`}
+        description={article.excerpt || "Read this article on Tabassum Authoy's portfolio website."}
+        keywords={`${article.category}, Tabassum Authoy, blog, article`}
+      />
       <Navbar />
       <article className="article-detail">
         {/* Header content and Author Block */}

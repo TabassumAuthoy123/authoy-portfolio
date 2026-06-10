@@ -4,6 +4,14 @@ const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const otpGenerator = require('otp-generator');
 const Admin = require('../models/Admin');
+const {
+  validate,
+  loginRules,
+  forgotPasswordRules,
+  verifyOtpRules,
+  resetPasswordRules,
+  changePasswordRules
+} = require('../middleware/validator');
 const router = express.Router();
 
 // Email Transporter Setup
@@ -16,7 +24,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', validate(loginRules), async (req, res) => {
   try {
     const { email, password } = req.body;
     const admin = await Admin.findOne({ email });
@@ -54,7 +62,7 @@ router.post('/verify', async (req, res) => {
 });
 
 // POST /api/auth/forgot-password
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', validate(forgotPasswordRules), async (req, res) => {
   try {
     const { email } = req.body;
     const admin = await Admin.findOne({ email });
@@ -66,7 +74,7 @@ router.post('/forgot-password', async (req, res) => {
     admin.resetOTP = otp;
     admin.resetOTPExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes validity
     
-    // Using save with validateBeforeSave: false in case other fields trigger validation (not strictly necessary here but safe)
+    // Using save with validateBeforeSave: false in case other fields trigger validation
     await admin.save({ validateBeforeSave: false });
 
     await transporter.sendMail({
@@ -89,7 +97,7 @@ router.post('/forgot-password', async (req, res) => {
 });
 
 // POST /api/auth/verify-otp
-router.post('/verify-otp', async (req, res) => {
+router.post('/verify-otp', validate(verifyOtpRules), async (req, res) => {
   try {
     const { email, otp } = req.body;
     const admin = await Admin.findOne({ email, resetOTP: otp, resetOTPExpiry: { $gt: Date.now() } });
@@ -105,7 +113,7 @@ router.post('/verify-otp', async (req, res) => {
 });
 
 // POST /api/auth/reset-password
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', validate(resetPasswordRules), async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
     const admin = await Admin.findOne({ email, resetOTP: otp, resetOTPExpiry: { $gt: Date.now() } });
@@ -120,6 +128,32 @@ router.post('/reset-password', async (req, res) => {
     await admin.save();
 
     res.json({ message: 'Password reset successful' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// POST /api/auth/change-password (requires current auth)
+router.post('/change-password', validate(changePasswordRules), async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ message: 'Not authenticated' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const admin = await Admin.findById(decoded.id);
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+
+    const { currentPassword, newPassword } = req.body;
+
+    const isMatch = await admin.matchPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    admin.password = newPassword;
+    await admin.save();
+
+    res.json({ message: 'Password changed successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

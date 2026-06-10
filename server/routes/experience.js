@@ -1,6 +1,7 @@
 const express = require('express');
 const auth = require('../middleware/auth');
 const Experience = require('../models/Experience');
+const { validate, experienceRules } = require('../middleware/validator');
 const router = express.Router();
 
 // GET /api/experience - public
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/experience - admin only
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, validate(experienceRules), async (req, res) => {
   try {
     const exp = await Experience.create(req.body);
     res.status(201).json(exp);
@@ -24,7 +25,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // PUT /api/experience/:id - admin only
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, validate(experienceRules), async (req, res) => {
   try {
     const exp = await Experience.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!exp) return res.status(404).json({ message: 'Experience not found' });

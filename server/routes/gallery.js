@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const GalleryItem = require('../models/GalleryItem');
 const auth = require('../middleware/auth');
+const { validate, galleryRules } = require('../middleware/validator');
 
 // GET all gallery items (public)
 router.get('/', async (req, res) => {
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST create gallery item (admin)
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, validate(galleryRules), async (req, res) => {
   try {
     const item = new GalleryItem(req.body);
     await item.save();
@@ -25,7 +26,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // PUT update gallery item (admin)
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, validate(galleryRules), async (req, res) => {
   try {
     const item = await GalleryItem.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(item);

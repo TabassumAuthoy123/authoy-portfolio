@@ -1,6 +1,7 @@
 const express = require('express');
 const auth = require('../middleware/auth');
 const Achievement = require('../models/Achievement');
+const { validate, achievementRules } = require('../middleware/validator');
 const router = express.Router();
 
 // GET /api/achievements - public
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/achievements - admin only
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, validate(achievementRules), async (req, res) => {
   try {
     const achievement = await Achievement.create(req.body);
     res.status(201).json(achievement);
@@ -24,7 +25,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // PUT /api/achievements/:id - admin only
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, validate(achievementRules), async (req, res) => {
   try {
     const achievement = await Achievement.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!achievement) return res.status(404).json({ message: 'Achievement not found' });

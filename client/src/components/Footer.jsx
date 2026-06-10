@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { FiGithub, FiLinkedin, FiMail, FiArrowUp, FiStar, FiMessageCircle } from 'react-icons/fi';
 import { FaFacebook, FaTwitter } from 'react-icons/fa';
+import { getProfile, getSettings } from '../api';
 
 const quickLinks = [
   { label: 'Home', href: '#home' },
@@ -11,7 +13,7 @@ const quickLinks = [
   { label: 'Contact', href: '#contact' },
 ];
 
-const socials = [
+const FALLBACK_SOCIALS = [
   { icon: <FiGithub size={18} />, label: 'GitHub', url: 'https://github.com/TabassumAuthoy123' },
   { icon: <FiLinkedin size={18} />, label: 'LinkedIn', url: 'https://linkedin.com/in/tabassum-authoy' },
   { icon: <FaFacebook size={18} />, label: 'Facebook', url: 'https://facebook.com/tabassumauthoy' },
@@ -19,7 +21,43 @@ const socials = [
 ];
 
 export default function Footer() {
+  const [profile, setProfile] = useState(null);
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    getProfile().then(res => setProfile(res.data)).catch(() => {});
+    getSettings().then(res => setSettings(res.data)).catch(() => {});
+  }, []);
+
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Build social links from settings or profile, fall back to defaults
+  const buildSocials = () => {
+    const s = settings?.socialLinks || {};
+    const p = profile || {};
+    const socialList = [];
+
+    const github = s.github || p.githubUrl || 'https://github.com/TabassumAuthoy123';
+    if (github) socialList.push({ icon: <FiGithub size={18} />, label: 'GitHub', url: github });
+
+    const linkedin = s.linkedin || p.linkedinUrl || 'https://linkedin.com/in/tabassum-authoy';
+    if (linkedin) socialList.push({ icon: <FiLinkedin size={18} />, label: 'LinkedIn', url: linkedin });
+
+    const facebook = s.facebook || 'https://facebook.com/tabassumauthoy';
+    if (facebook) socialList.push({ icon: <FaFacebook size={18} />, label: 'Facebook', url: facebook });
+
+    const email = p.email || settings?.supportEmail || 'authoy@email.com';
+    if (email) socialList.push({ icon: <FiMail size={18} />, label: 'Email', url: `mailto:${email}` });
+
+    return socialList.length > 0 ? socialList : FALLBACK_SOCIALS;
+  };
+
+  const socials = buildSocials();
+  const footerText = settings?.footerText || '© 2026 Tabassum Authoy. All rights reserved.';
+  const brandName = settings?.brandName || 'Tabassum Authoy';
+  const nameParts = brandName.split(' ');
+  const firstName = nameParts.slice(0, -1).join(' ') || brandName;
+  const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 
   return (
     <footer className="ft">
@@ -35,13 +73,16 @@ export default function Footer() {
                 <FiStar size={18} />
               </div>
               <span className="ft__brand-name">
-                Tabassum <span className="ft__brand-highlight">Authoy</span>
+                {firstName} <span className="ft__brand-highlight">{lastName}</span>
               </span>
             </div>
-            <p className="ft__role">Creative Developer & Designer</p>
+            <p className="ft__role">
+              {profile?.title || 'Full Stack Developer & Competitive Programmer'}
+            </p>
             <p className="ft__desc">
-              Full Stack Developer focused on building efficient, scalable web
-              solutions. Passionate about clean code and problem-solving.
+              {profile?.bio
+                ? profile.bio.substring(0, 160) + (profile.bio.length > 160 ? '...' : '')
+                : 'Full Stack Developer focused on building efficient, scalable web solutions. Passionate about clean code and problem-solving.'}
             </p>
           </div>
 
@@ -106,8 +147,8 @@ export default function Footer() {
 
         {/* ── Bottom Bar ── */}
         <div className="ft__bottom">
-          <span className="ft__bottom-left">Made by Tabassum Authoy</span>
-          <span className="ft__bottom-center">© 2025 All rights reserved.</span>
+          <span className="ft__bottom-left">Made by {brandName}</span>
+          <span className="ft__bottom-center">{footerText}</span>
           <button className="ft__back-top" onClick={scrollToTop} aria-label="Back to top">
             <FiArrowUp size={16} />
           </button>

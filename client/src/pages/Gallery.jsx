@@ -5,6 +5,7 @@ import { getImageUrl } from '../api';
 import { FiArrowLeft, FiX, FiChevronLeft, FiChevronRight, FiImage, FiGrid } from 'react-icons/fi';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SEOHead from '../components/SEOHead';
 
 const categories = ['All', 'Design', 'Photography', 'Events', 'Projects'];
 
@@ -63,6 +64,11 @@ export default function Gallery() {
 
   return (
     <>
+      <SEOHead 
+        title="Visual Showcase & Gallery | Tabassum Authoy"
+        description="Browse photos, design works, project visuals, and event highlights in the creative gallery of Tabassum Authoy."
+        keywords="developer gallery, photo showcase, design portfolio, Tabassum Authoy gallery"
+      />
       <Navbar />
       <div className="gallery-page">
         {/* Hero Banner */}

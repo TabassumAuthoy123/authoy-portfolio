@@ -5,6 +5,7 @@ import { getImageUrl } from '../api';
 import { FiArrowLeft, FiClock, FiCalendar, FiArrowRight, FiBookOpen } from 'react-icons/fi';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SEOHead from '../components/SEOHead';
 
 const categories = ['All', 'Tech', 'Tutorial', 'Opinion', 'Career'];
 
@@ -26,6 +27,11 @@ export default function Articles() {
 
   return (
     <>
+      <SEOHead 
+        title="Articles & Thoughts | Tabassum Authoy"
+        description="Read articles, tutorials, opinions, and thoughts about full stack development and competitive programming by Tabassum Authoy."
+        keywords="developer articles, coding blog, Tabassum Authoy blog, MERN tutorials"
+      />
       <Navbar />
       <div className="articles-page">
         {/* Hero Banner */}

@@ -15,7 +15,8 @@ const FALLBACK_PROFILE = {
 
 export default function Contact() {
   const [profile, setProfile] = useState(null);
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', message: '', honeypot: '' });
+  const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('');
   const [sending, setSending] = useState(false);
 
@@ -61,18 +62,32 @@ export default function Contact() {
     { icon: <FiLinkedin size={20} />, label: 'LinkedIn', url: p.linkedinUrl || FALLBACK_PROFILE.linkedinUrl },
   ];
 
+  const validateForm = () => {
+    const errs = {};
+    if (!form.name.trim()) errs.name = 'Name is required';
+    if (!form.email.trim()) errs.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Invalid email format';
+    if (!form.message.trim()) errs.message = 'Message is required';
+    else if (form.message.trim().length < 10) errs.message = 'Message must be at least 10 characters';
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setSending(true);
     setStatus('');
     try {
       await sendMessage({
         name: form.name,
         email: form.email,
-        message: form.message
+        message: form.message,
+        honeypot: form.honeypot
       });
       setStatus('sent');
-      setForm({ name: '', email: '', message: '' });
+      setForm({ name: '', email: '', message: '', honeypot: '' });
+      setErrors({});
     } catch (error) {
       console.error('Message failed to send:', error);
       setStatus('error');
@@ -137,39 +152,56 @@ export default function Contact() {
             <h3 className="ct__form-heading">Send a Message</h3>
             <p className="ct__form-subtitle">Fill in the details and I'll get back to you shortly.</p>
 
-            <form className="ct__form" onSubmit={handleSubmit}>
+            <form className="ct__form" onSubmit={handleSubmit} noValidate>
+              {/* Honeypot field — hidden from humans, catches bots */}
+              <input
+                type="text"
+                name="honeypot"
+                value={form.honeypot}
+                onChange={(e) => setForm({ ...form, honeypot: e.target.value })}
+                style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
+                tabIndex={-1}
+                autoComplete="off"
+              />
+
               <div className="ct__field">
                 <div className="ct__field-icon"><FiUser size={16} /></div>
                 <input
                   type="text"
                   value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  onChange={(e) => { setForm({ ...form, name: e.target.value }); if (errors.name) setErrors({...errors, name: ''}); }}
                   required
                   placeholder="Your Name"
+                  id="contact-name"
                 />
+                {errors.name && <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: 4, display: 'block' }}>{errors.name}</span>}
               </div>
               <div className="ct__field">
                 <div className="ct__field-icon"><FiAtSign size={16} /></div>
                 <input
                   type="email"
                   value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  onChange={(e) => { setForm({ ...form, email: e.target.value }); if (errors.email) setErrors({...errors, email: ''}); }}
                   required
                   placeholder="your@email.com"
+                  id="contact-email"
                 />
+                {errors.email && <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: 4, display: 'block' }}>{errors.email}</span>}
               </div>
               <div className="ct__field ct__field--textarea">
                 <div className="ct__field-icon"><FiMessageSquare size={16} /></div>
                 <textarea
                   rows="5"
                   value={form.message}
-                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  onChange={(e) => { setForm({ ...form, message: e.target.value }); if (errors.message) setErrors({...errors, message: ''}); }}
                   required
                   placeholder="What's on your mind?"
+                  id="contact-message"
                 ></textarea>
+                {errors.message && <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: 4, display: 'block' }}>{errors.message}</span>}
               </div>
 
-              <button type="submit" className="ct__submit" disabled={sending}>
+              <button type="submit" className="ct__submit" disabled={sending} id="contact-submit">
                 {sending ? 'Sending...' : <><FiSend size={16} /> Send Message</>}
               </button>
 

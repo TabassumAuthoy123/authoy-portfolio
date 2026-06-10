@@ -1,16 +1,25 @@
 const express = require('express');
 const auth = require('../middleware/auth');
 const Message = require('../models/Message');
+const { validate, contactRules } = require('../middleware/validator');
 const router = express.Router();
 
 // POST /api/contact - public (visitors send messages)
-router.post('/', async (req, res) => {
+router.post('/', validate(contactRules), async (req, res) => {
   try {
-    const { name, email, message } = req.body;
-    if (!name || !email || !message) {
-      return res.status(400).json({ message: 'All fields are required' });
+    const { name, email, message, honeypot, clientId } = req.body;
+
+    // Honeypot spam prevention — if this hidden field is filled, it's a bot
+    if (honeypot) {
+      return res.status(201).json({ message: 'Message sent successfully' });
     }
-    const msg = await Message.create({ name, email, message });
+
+    const msg = await Message.create({
+      name,
+      email,
+      message,
+      clientId: clientId || null
+    });
     res.status(201).json({ message: 'Message sent successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -50,3 +59,4 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 module.exports = router;
+
