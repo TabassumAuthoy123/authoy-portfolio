@@ -6,7 +6,7 @@ const achievementSchema = new mongoose.Schema({
   date: { type: String, default: '' },
   category: { 
     type: String, 
-    enum: ['competition', 'cp', 'sports', 'publications'],
+    enum: ['competition', 'cp', 'sports', 'publications', 'leadership', 'education'],
     required: true 
   },
   order: { type: Number, default: 0 },
