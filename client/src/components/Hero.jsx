@@ -5,15 +5,14 @@ import TagCloud from 'TagCloud';
 import createGlobe from 'cobe';
 import { TypeAnimation } from 'react-type-animation';
 
-// Fallback data — shown while loading or if API is down
 const FALLBACK = {
-  name: 'Tabassum Authoy',
-  title: 'Creative Developer & Designer | Problem Solver',
-  tagline: 'Building digital experiences that inspire.',
-  currentLearning: 'React & Next.js',
+  name: 'Tabassum Mustafa Authoy',
+  title: 'Software Engineer & Business Development Manager',
+  tagline: 'Working at the intersection of software engineering, AI safety research, and the classical arts.',
+  currentLearning: 'AI Safety & Deep Learning',
   githubUrl: 'https://github.com/TabassumAuthoy123',
   linkedinUrl: 'https://linkedin.com/in/tabassum-authoy',
-  floatingTags: ['UI/UX Magic', 'Clean Code', 'Innovation'],
+  floatingTags: ['AI Safety', 'SaaS Sales', 'SaaS Dev', 'Classical Arts'],
   yearsOfExperience: 3,
 };
 
@@ -162,11 +161,11 @@ export default function Hero() {
               sequence={[
                 p.title || FALLBACK.title,
                 2000,
-                'Full Stack Developer',
+                'Software Engineer',
                 2000,
-                'Competitive Programmer',
+                'AI Safety Researcher',
                 2000,
-                'Problem Solver',
+                'Business Development Manager',
                 2000,
               ]}
               wrapper="span"

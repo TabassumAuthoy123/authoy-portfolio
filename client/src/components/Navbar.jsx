@@ -25,7 +25,7 @@ export default function Navbar() {
     }
     return 'dark';
   });
-  const [resumeLink, setResumeLink] = useState('/Tabassum%20Authoy%20-CV.pdf');
+  const [resumeLink, setResumeLink] = useState('/Tabassum_Mustafa_Authoy_CV.pdf');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);

@@ -62,7 +62,7 @@ const seedData = async () => {
       ],
       quote: "I work at the intersection of software engineering, AI safety research, and the classical arts.",
       photoUrl: '/placeholder-avatar.png',
-      resumeUrl: '/Tabassum%20Mustafa%20Authoy%20-CV.pdf',
+      resumeUrl: '/uploads/Tabassum_Mustafa_Authoy_CV.pdf',
       githubUrl: 'https://github.com/TabassumAuthoy123',
       linkedinUrl: 'https://linkedin.com/in/tabassum-authoy',
       floatingTags: ['AI Safety', 'SaaS Sales', 'SaaS Dev', 'Classical Arts'],
