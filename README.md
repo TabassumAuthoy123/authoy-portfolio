@@ -245,6 +245,27 @@ See [.env.example](./.env.example) for all required variables.
 
 ---
 
+## 📱 Android Companion App Workflow
+
+The repository includes a mobile companion app built in Jetpack Compose that connects to the backend portfolio API.
+
+### Build & Package APK
+
+1. Ensure the backend server is running at `http://localhost:5000` (or `http://10.0.2.2:5000` inside the Android Emulator).
+2. Configure **JAVA_HOME** pointing to JDK 17 (pre-installed locally for this user at `C:\Users\SBD - Commercial 23\.android\jdk17\jdk-17.0.19+10`).
+3. Compile the debug APK using Gradle:
+
+```powershell
+cd android-app
+$env:JAVA_HOME="C:\Users\SBD - Commercial 23\.android\jdk17\jdk-17.0.19+10"
+.\gradlew.bat assembleDebug
+```
+
+4. Locate the compiled debug binary at:
+   `android-app/app/build/outputs/apk/debug/app-debug.apk`
+
+---
+
 ## 📄 License
 
 © 2026 Tabassum Authoy. All rights reserved.
