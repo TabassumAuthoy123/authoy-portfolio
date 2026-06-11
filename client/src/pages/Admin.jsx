@@ -1293,8 +1293,8 @@ function ProfileTab({ profile, onSave, showNotif }) {
           </div>
           <div className="ta-form-group">
             <label className="ta-form-label">About Stats (one per line: icon|value|label)</label>
-            <span className="ta-form-hint">Example: 🎓|3rd Year|CSE at AUST</span>
-            <textarea className="ta-form-textarea" rows={5} placeholder={'💼|3rd Year|CSE at AUST\n💻|400+|Problems Solved'} value={form.stats} onChange={e => set('stats', e.target.value)} />
+            <span className="ta-form-hint">Example: 🎓|MSc / EMBA|BRAC & DU</span>
+            <textarea className="ta-form-textarea" rows={5} placeholder={'💼|Manager|BD at SoftifyBD\n🎓|MSc / EMBA|BRAC & DU'} value={form.stats} onChange={e => set('stats', e.target.value)} />
           </div>
         </div>
       </div>
@@ -1554,7 +1554,7 @@ function LeadershipForm({ item, onSave }) {
       <div className="ta-form-row">
         <div className="ta-form-group">
           <label className="ta-form-label">Organization</label>
-          <input className="ta-form-input" placeholder="AUST CSE Club" value={form.organization} onChange={e => setForm({ ...form, organization: e.target.value })} />
+          <input className="ta-form-input" placeholder="SEGi University Cultural Club" value={form.organization} onChange={e => setForm({ ...form, organization: e.target.value })} />
         </div>
         <div className="ta-form-group">
           <label className="ta-form-label">Role</label>

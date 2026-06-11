@@ -13,9 +13,9 @@ export default function Home() {
   return (
     <>
       <SEOHead 
-        title="Tabassum Authoy | Full Stack Developer & Competitive Programmer"
-        description="Tabassum Authoy — Full Stack Developer & Competitive Programmer. Building production-grade web applications with React, Node.js, Laravel, and modern technologies. 400+ competitive programming problems solved."
-        keywords="Tabassum Authoy, developer, programmer, React, Node.js, Laravel, MERN stack, Bangladesh, AUST CSE"
+        title="Tabassum Mustafa Authoy | Software Engineer & Researcher"
+        description="Tabassum Mustafa Authoy — Software Engineer, AI safety researcher, and Business Development Manager. Working at the intersection of technology, research, and art."
+        keywords="Tabassum Mustafa Authoy, Tabassum Authoy, Software Engineer, AI Safety, BRAC University, DU EMBA, SEGi University, B2B SaaS, SoftifyBD, classical dance"
       />
       <Navbar />
       <Hero />

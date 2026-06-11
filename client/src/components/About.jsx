@@ -4,18 +4,19 @@ import { getProfile, getImageUrl } from '../api';
 
 // Fallback data
 const FALLBACK = {
-  photoUrl: '/WhatsApp Image 2026-02-24 at 9.28.02 PM.jpeg',
-  quote: "\"The best code I've ever written wasn't about choosing the right framework — it was about truly understanding the problem first.\"",
+  photoUrl: '/placeholder-avatar.png',
+  quote: "\"I work at the intersection of software engineering, AI safety research, and the classical arts.\"",
   bio: [
-    "I'm a 3rd-year Computer Science student at Ahsanullah University of Science and Technology, currently working as an Intern Software Engineer at Softify BD Ltd. My journey in tech started with competitive programming — solving 400+ problems across Codeforces, AtCoder, CodeChef, and LeetCode.",
-    "This sharpened my algorithmic thinking and problem-solving skills, which I now apply to building real-world applications. I work with React, Laravel, Express, Node.js, MongoDB, MySQL, Docker, and Redux to craft full-stack solutions that make a difference.",
-    "Beyond coding, I lead as Head of Administration at AUST Programming and Informatics Club, coordinating large-scale events like AUST IUPC 2025 and Job Fair 2025. I believe in building not just software, but communities that inspire growth.",
+    "I am a multidisciplinary practitioner working at the intersection of technology, research, and art. As a software engineer, aspiring AI safety researcher, and trained classical performer based in Dhaka, Bangladesh, my work focuses on bridging reliable engineering with scientific and creative exploration.",
+    "With hands-on experience spanning front-end development, travel OTA platform engineering, UI/UX collaboration, digital platform coordination, and IT-driven business operations, I specialize in technical solution design, building functional web interfaces, supporting platform operations, and coordinating between clients and development teams to deliver reliable products.",
+    "My long-term ambition is to contribute to the design of reliable and trustworthy artificial intelligence systems—particularly in reducing hallucinations and uncertainty in large language models, and bridging data-driven models with practical software architecture.",
+    "Outside of work, I am a trained classical Bangla performer at Chhayanaut Shongshkriti-Bhobon, an amateur photographer, and a traveler whose practice draws as much from the South Asian classical tradition as from contemporary computer science."
   ],
   stats: [
-    { icon: '💼', value: '3rd Year', label: 'CSE at AUST' },
-    { icon: '💻', value: '400+',     label: 'Problems Solved' },
-    { icon: '🏆', value: 'Head',     label: 'APIC Admin' },
-    { icon: '🚀', value: 'Intern',   label: 'Softify BD' },
+    { icon: '💼', value: 'Manager', label: 'BD at SoftifyBD' },
+    { icon: '🎓', value: 'MSc / EMBA', label: 'BRAC & DU' },
+    { icon: '💻', value: 'BSc IT', label: 'First Class Hons' },
+    { icon: '🩰', value: 'Artist', label: 'Classical Performer' }
   ],
 };
 
