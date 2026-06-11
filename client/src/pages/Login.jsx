@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, forgotPassword, resetPassword } from '../api';
-import { FiArrowLeft, FiCheck, FiMail, FiLock, FiKey } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiMail, FiLock, FiKey, FiEye, FiEyeOff } from 'react-icons/fi';
 import './Admin.css';
 
 export default function Login() {
@@ -22,6 +22,8 @@ export default function Login() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -135,14 +137,34 @@ export default function Login() {
                     <FiLock style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: 'hsl(var(--muted))' }} />
                     <input
                       className="ta-form-input"
-                      style={{ paddingLeft: '45px' }}
-                      type="password"
+                      style={{ paddingLeft: '45px', paddingRight: '45px' }}
+                      type={showPassword ? 'text' : 'password'}
                       id="password"
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '15px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: 'hsl(var(--muted-fg, 215 16% 47%))',
+                        padding: 0
+                      }}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px', width: '100%' }}>
                     <button type="button" onClick={() => { setView('forgot'); setError(''); setSuccess(''); }} style={{ background: 'none', border: 'none', color: 'hsl(var(--primary))', fontSize: '0.85rem', cursor: 'pointer', marginLeft: 'auto' }}>
@@ -224,14 +246,34 @@ export default function Login() {
                     <FiLock style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: 'hsl(var(--muted))' }} />
                     <input
                       className="ta-form-input"
-                      style={{ paddingLeft: '45px' }}
-                      type="password"
+                      style={{ paddingLeft: '45px', paddingRight: '45px' }}
+                      type={showNewPassword ? 'text' : 'password'}
                       id="newPassword"
                       placeholder="Enter new password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '15px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: 'hsl(var(--muted-fg, 215 16% 47%))',
+                        padding: 0
+                      }}
+                      aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showNewPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                 </div>
                 {error && <div className="ta-login__error">{error}</div>}

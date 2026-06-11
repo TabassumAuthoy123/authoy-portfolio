@@ -81,7 +81,8 @@ export default function Footer() {
             </p>
             <p className="ft__desc">
               {profile?.bio
-                ? profile.bio.substring(0, 160) + (profile.bio.length > 160 ? '...' : '')
+                ? (Array.isArray(profile.bio) ? profile.bio.join(' ') : profile.bio).substring(0, 160) + 
+                  ((Array.isArray(profile.bio) ? profile.bio.join(' ') : profile.bio).length > 160 ? '...' : '')
                 : 'Full Stack Developer focused on building efficient, scalable web solutions. Passionate about clean code and problem-solving.'}
             </p>
           </div>

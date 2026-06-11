@@ -1,34 +1,94 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const path = require('path');
 
-dotenv.config();
+// Load environment variables relative to current script directory and parent directory
+dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const Admin = require('./models/Admin');
 const Project = require('./models/Project');
 const Skill = require('./models/Skill');
 const Experience = require('./models/Experience');
 const Achievement = require('./models/Achievement');
+const Leadership = require('./models/Leadership');
+const Profile = require('./models/Profile');
+const Client = require('./models/Client');
+const Article = require('./models/Article');
+const GalleryItem = require('./models/GalleryItem');
 
 const seedData = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
+    const mongoUri = process.env.MONGO_URI;
+    if (!mongoUri) {
+      throw new Error('MONGO_URI is not defined in process.env');
+    }
+    await mongoose.connect(mongoUri);
+    console.log('Connected to MongoDB:', mongoUri);
 
-    // Clear existing data
+    // Clear existing data in all collections
     await Admin.deleteMany({});
     await Project.deleteMany({});
     await Skill.deleteMany({});
     await Experience.deleteMany({});
     await Achievement.deleteMany({});
+    await Leadership.deleteMany({});
+    await Profile.deleteMany({});
+    await Client.deleteMany({});
+    await Article.deleteMany({});
+    await GalleryItem.deleteMany({});
+    console.log('Cleared existing collections.');
 
-    // Create admin
+    // 1. Create admin
     await Admin.create({
       email: 'authoy@email.com',
       password: 'AuthoyAdmin@2026!',
     });
-    console.log('Admin created (email: authoy@email.com, password: admin)');
+    console.log('Admin created (email: authoy@email.com, password: AuthoyAdmin@2026!)');
 
-    // Seed Projects
+    // 2. Seed Profile
+    await Profile.create({
+      name: 'Tabassum Authoy',
+      title: 'Project Coordinator Intern & Software Engineer',
+      tagline: 'Building digital experiences that inspire and solve real-world problems.',
+      email: 'authoy@email.com',
+      phone: '+880 1XXX-XXXXXX',
+      location: 'Dhaka, Bangladesh',
+      bio: [
+        "I'm a 3rd-year Computer Science student at Ahsanullah University of Science and Technology, currently working as an Intern Software Engineer at Softify BD Ltd. My journey in tech started with competitive programming — solving 400+ problems across Codeforces, AtCoder, CodeChef, and LeetCode.",
+        "This sharpened my algorithmic thinking and problem-solving skills, which I now apply to building real-world applications. I work with React, Laravel, Express, Node.js, MongoDB, MySQL, Docker, and Redux to craft full-stack solutions that make a difference.",
+        "Beyond coding, I lead as Head of Administration at AUST Programming and Informatics Club, coordinating large-scale events like AUST IUPC 2025 and Job Fair 2025. I believe in building not just software, but communities that inspire growth."
+      ],
+      quote: "I craft elegant digital experiences with clean code and thoughtful design. Turning complex ideas into beautiful, intuitive interfaces.",
+      photoUrl: '/placeholder-avatar.png',
+      resumeUrl: '/Tabassum%20Authoy%20-CV.pdf',
+      githubUrl: 'https://github.com/TabassumAuthoy123',
+      linkedinUrl: 'https://linkedin.com/in/tabassum-authoy',
+      floatingTags: ['UI/UX Magic', 'Clean Code', 'Innovation'],
+      stats: [
+        { icon: '💼', value: '3rd Year', label: 'CSE at AUST' },
+        { icon: '💻', value: '400+',     label: 'Problems Solved' },
+        { icon: '🏆', value: 'Head',     label: 'APIC Admin' },
+        { icon: '🚀', value: 'Intern',   label: 'Softify BD' }
+      ]
+    });
+    console.log('Profile seeded');
+
+    // 3. Seed Default B2B/B2C Client (Credentials)
+    await Client.create({
+      companyName: 'SoftifyBD Ltd.',
+      contactName: 'Tabassum Authoy',
+      contactEmail: 'authoy@email.com',
+      plan: 'professional',
+      status: 'active',
+      apiKey: 'pk_authoyb2cclientkey2026',
+      notes: 'Default B2B/B2C client seeded for portal testing.',
+      projectsDelivered: 5,
+      totalRevenue: 1500,
+    });
+    console.log('Default B2B/B2C Client seeded (API Key: pk_authoyb2cclientkey2026)');
+
+    // 4. Seed Projects
     await Project.insertMany([
       {
         title: 'Bizz-Insight',
@@ -54,7 +114,7 @@ const seedData = async () => {
     ]);
     console.log('Projects seeded');
 
-    // Seed Skills
+    // 5. Seed Skills
     const skills = [
       // Languages
       { name: 'C', category: 'language', order: 1 },
@@ -91,42 +151,82 @@ const seedData = async () => {
     await Skill.insertMany(skills);
     console.log('Skills seeded');
 
-    // Seed Experience
+    // 6. Seed Experience
     await Experience.insertMany([
       {
-        role: 'Intern Software Engineer',
+        role: 'Project Coordinator Intern',
         company: 'Softify BD Ltd.',
+        location: 'Dhaka, Bangladesh',
         duration: 'Dec 2025 – Present',
-        description: [
-          'Working on production-level software development tasks in a professional environment',
-          'Collaborating with senior engineers on feature development, debugging, and code optimization',
-          'Following industry-standard workflows, version control practices, and agile methodologies',
-        ],
         type: 'work',
+        icon: '💼',
+        accent: '#F97316',
+        summary: 'Coordinating project workflows, collaborating with cross-functional teams, and ensuring timely delivery of software milestones.',
+        highlights: [
+          'Coordinating development sprints and project deliverables',
+          'Collaborating with senior engineers and stakeholders',
+          'Following industry-standard agile workflows and version control',
+        ],
+        tags: ['Project Management', 'Agile', 'Git', 'Communication'],
+        description: [],
         order: 1,
+      },
+      {
+        role: 'Intern Software Developer',
+        company: 'GetUp Limited',
+        location: 'Dhaka, Bangladesh',
+        duration: 'Sep 2025 – Nov 2025',
+        type: 'work',
+        icon: '💻',
+        accent: '#3B82F6',
+        summary: 'Contributed to software development tasks using modern web technologies in a fast-paced startup environment.',
+        highlights: [
+          'Developed features for web applications',
+          'Collaborated with the dev team on debugging and code reviews',
+          'Gained hands-on experience with production-level codebases',
+        ],
+        tags: ['JavaScript', 'React', 'Node.js', 'REST API'],
+        description: [],
+        order: 2,
       },
       {
         role: 'B.Sc. in Computer Science and Engineering',
         company: 'Ahsanullah University of Science and Technology',
         duration: 'May 2023 – Present',
-        description: ['3rd Year, 2nd Semester'],
         type: 'education',
+        icon: '📗',
+        accent: '#3ECF8E',
+        summary: 'Focused on comprehensive software development skills with emphasis on problem-solving, system design, and intelligent computing methodologies.',
+        achievements: [
+          { label: 'CGPA', value: '3.508' },
+          { label: 'Department', value: 'CSE' },
+        ],
+        tags: ['Full-Stack Development', 'Data Structure', 'Algorithm', 'OOP'],
+        description: ['3rd Year, 2nd Semester'],
         gpa: 'CGPA: 3.508 / 4.00',
-        order: 2,
+        order: 3,
       },
       {
         role: 'Higher Secondary Certificate (HSC)',
         company: 'BAF Shaheen College, Dhaka',
         duration: 'Jan 2019 – Dec 2021',
-        description: [],
         type: 'education',
+        icon: '📘',
+        accent: '#3B82F6',
+        summary: 'Developed strong analytical and critical thinking skills through comprehensive study of Science.',
+        achievements: [
+          { label: 'GPA', value: '5.00' },
+          { label: 'Group', value: 'Science' },
+        ],
+        tags: ['Mathematics', 'Physics', 'Chemistry', 'ICT'],
+        description: [],
         gpa: 'GPA: 5.00 / 5.00',
-        order: 3,
+        order: 4,
       },
     ]);
     console.log('Experience seeded');
 
-    // Seed Achievements
+    // 7. Seed Achievements
     await Achievement.insertMany([
       {
         title: 'Champion — SPOT N\'GO Robotics Contest',
@@ -163,25 +263,83 @@ const seedData = async () => {
         category: 'cp',
         order: 5,
       },
-      {
-        title: 'Head of Administration — AUST Programming and Informatics Club',
-        description: 'Coordinating MTB presents AUST IUPC 2025 and Job Fair 2025',
-        date: 'Jan 2024 – Present',
-        category: 'leadership',
-        order: 6,
-      },
-      {
-        title: 'Founding Secretary — BAFSD Mathematics Club',
-        description: 'Established the club\'s administrative framework and collaborated with the founding team',
-        date: 'Sep 2020 – Apr 2022',
-        category: 'leadership',
-        order: 7,
-      },
     ]);
     console.log('Achievements seeded');
 
+    // 8. Seed Leadership
+    await Leadership.insertMany([
+      {
+        title: 'Head of Administration',
+        organization: 'AUST Programming & Informatics Club (APIC)',
+        role: 'Head of Administration',
+        description: 'Coordinating MTB presents AUST IUPC 2025 and Job Fair 2025.',
+        date: 'Jan 2024 – Present',
+        icon: '🏛️',
+        accent: '#2dd4bf',
+        isActive: true,
+        order: 1,
+      },
+      {
+        title: 'Founding Secretary — Brain Games',
+        organization: 'BAFSD Mathematics Club',
+        role: 'Founding Secretary',
+        description: "Established the club's administrative framework and collaborated with the founding team.",
+        date: 'Sep 2020 – Apr 2022',
+        icon: '🧠',
+        accent: '#3B82F6',
+        isActive: false,
+        order: 2,
+      },
+      {
+        title: 'Officer of Olympiads',
+        organization: 'BAFSD Science Club',
+        role: 'Officer of Olympiads',
+        description: 'Organized the 4th BAFSD Science Fest 2021.',
+        date: 'Sep 2020 – Mar 2022',
+        icon: '🔬',
+        accent: '#3ECF8E',
+        isActive: false,
+        order: 3,
+      },
+      {
+        title: 'Secretary of Marketing',
+        organization: 'BAFSD Green Thumbs (Nature Club)',
+        role: 'Secretary of Marketing',
+        description: 'Organized Online Nature Summit 2.0.',
+        date: 'Sep 2020 – Jan 2022',
+        icon: '🌿',
+        accent: '#22C55E',
+        isActive: false,
+        order: 4,
+      },
+      {
+        title: 'Associate Member',
+        organization: 'Bangladesh Science Congress Association',
+        role: 'Associate Member',
+        description: 'Participated in scientific discussions and congress activities.',
+        date: 'May 2021 – Apr 2022',
+        icon: '🔭',
+        accent: '#EAB308',
+        isActive: false,
+        order: 5,
+      },
+    ]);
+    console.log('Leadership seeded');
+
+    // 9. Seed Mock Article
+    await Article.create({
+      title: 'Navigating Competitive Programming as a Full-Stack Developer',
+      slug: 'navigating-competitive-programming',
+      excerpt: 'How solving 400+ problems on Codeforces helped build faster, more efficient full-stack web applications.',
+      content: 'Competitive programming is more than just passing test cases. It teaches you how to think about memory limits, edge cases, and runtime complexity. As a full-stack engineer, these principles translate directly into database index design, cache optimization, and efficient API responses. Combining algorithms with beautiful frontend interfaces creates high-fidelity production apps.',
+      category: 'Competitive Programming',
+      published: true,
+    });
+    console.log('Mock Article seeded');
+
     console.log('\n✅ All data seeded successfully!');
     console.log('Admin credentials: email=authoy@email.com, password=AuthoyAdmin@2026!');
+    console.log('Client Portal credentials: API Key=pk_authoyb2cclientkey2026');
   } catch (error) {
     console.error('Seed error:', error);
     throw error;
@@ -189,7 +347,15 @@ const seedData = async () => {
 };
 
 if (require.main === module) {
-  seedData().then(() => process.exit(0)).catch(() => process.exit(1));
+  seedData()
+    .then(() => {
+      console.log('Seed success. Exiting process.');
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error('Seed failed. Exiting process.', err);
+      process.exit(1);
+    });
 } else {
   module.exports = seedData;
 }

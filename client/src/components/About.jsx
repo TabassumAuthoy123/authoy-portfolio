@@ -35,7 +35,10 @@ export default function About() {
     ? p.stats
     : FALLBACK.stats;
 
-  const bio = p.bio?.length ? p.bio : FALLBACK.bio;
+  const rawBio = p.bio?.length ? p.bio : FALLBACK.bio;
+  const bio = Array.isArray(rawBio)
+    ? rawBio
+    : (typeof rawBio === 'string' ? [rawBio] : FALLBACK.bio);
   const quote = p.quote || FALLBACK.quote;
   const photoUrl = p.photoUrl || FALLBACK.photoUrl;
   // Since FALLBACK.photoUrl is a local public asset, don't pass it to getImageUrl if it's the fallback

@@ -1,4 +1,4 @@
-﻿/* ===== Mostaim-inspired Premium Portfolio ===== */
+/* ===== Mostaim-inspired Premium Portfolio ===== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 *,
@@ -16,30 +16,30 @@
   --card-fg: 222 47% 11%;
   --muted: 210 20% 92%;
   --muted-fg: 215 16% 47%;
-  --primary: 262 83% 58%;
+  --primary: 217 91% 60%; /* Vibrant Royal Blue */
   --primary-fg: 0 0% 100%;
-  --accent: 280 70% 65%;
+  --accent: 262 83% 58%; /* Vibrant Violet/Purple */
   --accent-fg: 0 0% 100%;
   --border: 210 20% 90%;
-  --ring: 262 83% 58%;
+  --ring: 217 91% 60%;
   --radius: 0.75rem;
   --font: 'Inter', 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif: 'Playfair Display', 'Noto Sans Bengali', serif;
 }
 
 [data-theme="dark"] {
-  --bg: 222 47% 10%;
+  --bg: 222 47% 6%; /* Deep Space Black */
   --fg: 210 40% 98%;
-  --card: 222 40% 14%;
+  --card: 222 47% 9%; /* Glass card base */
   --card-fg: 210 40% 98%;
-  --muted: 222 30% 18%;
+  --muted: 222 30% 12%;
   --muted-fg: 215 20% 65%;
-  --primary: 262 80% 65%;
+  --primary: 199 89% 48%; /* Neon Cyan/Blue */
   --primary-fg: 0 0% 100%;
-  --accent: 280 70% 70%;
+  --accent: 280 85% 66%; /* Neon Violet */
   --accent-fg: 0 0% 100%;
-  --border: 222 25% 22%;
-  --ring: 262 80% 65%;
+  --border: 222 30% 16%;
+  --ring: 199 89% 48%;
 }
 
 html {
@@ -78,51 +78,51 @@ img {
 }
 
 [data-theme="dark"] .hero-gradient {
-  background: linear-gradient(135deg, #1f0f3d 0%, #0c0c12 40%, #0c0c12 100%);
+  background: linear-gradient(135deg, #120925 0%, #06060c 40%, #06060c 100%);
 }
 
 .text-gradient {
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  background: linear-gradient(135deg, #1d4ed8, #059669); /* Blue to Emerald */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 [data-theme="dark"] .text-gradient {
-  background: linear-gradient(90deg, #60a5fa, #2dd4bf);
+  background: linear-gradient(135deg, #00f2fe, #4facfe); /* Neon Cyan to Electric Blue */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-accent {
-  background: linear-gradient(90deg, hsl(var(--accent)), #9333ea);
+  background: linear-gradient(135deg, #7c3aed, #db2777); /* Purple to Pink */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 [data-theme="dark"] .text-gradient-accent {
-  background: linear-gradient(90deg, hsl(var(--accent)), #2dd4bf);
+  background: linear-gradient(135deg, #f472b6, #c084fc); /* Light Pink to Purple */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .glow-primary {
-  box-shadow: 0 0 40px rgba(150, 150, 150, 0.15);
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
 }
 
 .glow-accent {
-  box-shadow: 0 0 40px rgba(150, 150, 150, 0.15);
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
 }
 
 [data-theme="dark"] .glow-primary {
-  box-shadow: 0 0 30px rgba(150, 150, 150, 0.15);
+  box-shadow: 0 0 30px rgba(0, 242, 254, 0.18);
 }
 
 [data-theme="dark"] .glow-accent {
-  box-shadow: 0 0 30px rgba(150, 150, 150, 0.15);
+  box-shadow: 0 0 30px rgba(243, 85, 255, 0.18);
 }
 
 /* ===== Container ===== */
