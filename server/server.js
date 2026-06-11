@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
+// const mongoSanitize = require('express-mongo-sanitize'); // Replaced with custom sanitizer for Express 5
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const seedData = require('./seed');
@@ -34,8 +34,23 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('combined'));
 }
 
-// NoSQL injection prevention
-app.use(mongoSanitize());
+// NoSQL injection prevention (Express 5 compatible — req.query is read-only)
+app.use((req, res, next) => {
+  const sanitize = (obj) => {
+    if (obj && typeof obj === 'object') {
+      for (const key of Object.keys(obj)) {
+        if (key.startsWith('$')) {
+          delete obj[key];
+        } else if (typeof obj[key] === 'object') {
+          sanitize(obj[key]);
+        }
+      }
+    }
+  };
+  if (req.body) sanitize(req.body);
+  if (req.params) sanitize(req.params);
+  next();
+});
 
 // ═══════════════════════════════════════
 //   CORS CONFIGURATION

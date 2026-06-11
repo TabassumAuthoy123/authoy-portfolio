@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
-dotenv.config({ path: '../.env' });
+dotenv.config();
 
 const Admin = require('./models/Admin');
 const Project = require('./models/Project');
