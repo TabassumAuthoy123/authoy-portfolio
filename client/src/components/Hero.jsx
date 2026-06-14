@@ -16,6 +16,8 @@ const FALLBACK = {
   yearsOfExperience: 3,
 };
 
+const cyclingWords = ['PLANNING','LOGIC','TECHNOLOGY','INNOVATION'];
+
 export default function Hero() {
   const [profile, setProfile] = useState(null);
   const containerRef = useRef(null);
@@ -31,7 +33,6 @@ export default function Hero() {
     textRef.current.style.setProperty("--mouse-y", `${y}px`);
   };
 
-  const cyclingWords = ['PLANNING','LOGIC','TECHNOLOGY','INNOVATION'];
   const [wordIndex, setWordIndex] = useState(0);
 
   useEffect(() => {
@@ -48,7 +49,6 @@ export default function Hero() {
   }, []);
 
   const p = profile || FALLBACK;
-  const tags = p.floatingTags?.length ? p.floatingTags : FALLBACK.floatingTags;
 
   // Refs for Magnetic Buttons
   const magneticGitRef = useRef(null);
@@ -100,9 +100,10 @@ export default function Hero() {
 
   useEffect(() => {
     if (!containerRef.current) return;
+    const container = containerRef.current;
     
     // Clear container to prevent duplicate clouds on re-renders (like React StrictMode)
-    containerRef.current.innerHTML = '';
+    container.innerHTML = '';
 
     const texts = [
       '⚛️', '⚡', '🟢', '🚂',
@@ -113,7 +114,7 @@ export default function Hero() {
     ];
     
     // Create the TagCloud
-    TagCloud(containerRef.current, texts, {
+    TagCloud(container, texts, {
       radius: window.innerWidth <= 768 ? 130 : 250,
       maxSpeed: 'normal',
       initSpeed: 'normal',
@@ -125,8 +126,8 @@ export default function Hero() {
     });
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = '';
+      if (container) {
+        container.innerHTML = '';
       }
     };
   }, []);

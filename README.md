@@ -264,6 +264,18 @@ $env:JAVA_HOME="C:\Users\SBD - Commercial 23\.android\jdk17\jdk-17.0.19+10"
 4. Locate the compiled debug binary at:
    `android-app/app/build/outputs/apk/debug/app-debug.apk`
 
+### 📲 How to Install & Test the APK
+
+#### On Android Studio Emulator
+1. Start your Android Virtual Device (AVD) emulator inside Android Studio.
+2. Drag and drop the `app-debug.apk` file directly onto the active emulator screen.
+3. The app will install automatically. Open it from the app drawer.
+
+#### On a Physical Mobile Device
+1. Transfer the `app-debug.apk` file to your Android phone (via USB, Google Drive, share apps, etc.).
+2. Locate the APK file on your mobile using a File Manager and tap it to install. (Enable "Install from Unknown Sources" if prompted).
+3. **Note:** To see dynamic data from the backend, make sure your mobile and server are on the same Wi-Fi network, and update the base API URL in the code to your local machine's IP address instead of `10.0.2.2`.
+
 ---
 
 ## 📄 License

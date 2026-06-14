@@ -149,16 +149,19 @@ export default function Navbar() {
       {/* Floating center pill nav — Restore Original Style */}
       <nav className="nav-floating">
         <div className={`nav-floating__pill ${open ? 'nav-floating__pill--open' : ''}`}>
-          {navLinks.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              className={`nav-floating__link ${active === id ? 'nav-floating__link--active' : ''}`}
-              onClick={() => scrollTo(id)}
-            >
-              <Icon size={14} />
-              {label}
-            </button>
-          ))}
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <button
+                key={link.id}
+                className={`nav-floating__link ${active === link.id ? 'nav-floating__link--active' : ''}`}
+                onClick={() => scrollTo(link.id)}
+              >
+                <Icon size={14} />
+                {link.label}
+              </button>
+            );
+          })}
           
           {/* Add Gallery/Article into the mobile floating list for better UX when "open" */}
           <div className="mobile-only" style={{ display: open ? 'contents' : 'none' }}>

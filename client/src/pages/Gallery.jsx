@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getGalleryItems } from '../api';
 import { getImageUrl } from '../api';
@@ -43,12 +43,12 @@ export default function Gallery() {
   };
   const closeLightbox = () => setLightbox({ open: false, index: 0 });
 
-  const navigateLightbox = (dir) => {
+  const navigateLightbox = useCallback((dir) => {
     setLightbox(prev => ({
       ...prev,
       index: (prev.index + dir + lightboxImages.length) % lightboxImages.length,
     }));
-  };
+  }, [lightboxImages.length]);
 
   // Close lightbox on Escape
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function Gallery() {
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [lightbox.open, lightboxImages.length]);
+  }, [lightbox.open, navigateLightbox]);
 
   return (
     <>

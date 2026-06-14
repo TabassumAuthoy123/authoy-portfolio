@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Articles from './pages/Articles';
 import ArticleDetail from './pages/ArticleDetail';
@@ -7,6 +8,45 @@ import Login from './pages/Login';
 import Admin from './pages/Admin';
 import ClientPortal from './pages/ClientPortal';
 import './App.css';
+
+/* ═══════════════════════════════════════
+   SCROLL TO HASH ELEMENT UTILITY
+   ═══════════════════════════════════════ */
+function ScrollToHash() {
+  const { hash, pathname } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const id = hash.replace('#', '');
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        // Element might not be rendered yet, observe DOM modifications
+        const observer = new MutationObserver((_, obs) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+            obs.disconnect();
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        
+        // Safety timeout to prevent infinite observer hanging
+        const timeout = setTimeout(() => observer.disconnect(), 2000);
+        return () => {
+          observer.disconnect();
+          clearTimeout(timeout);
+        };
+      }
+    } else {
+      // Scroll to top on standard subpage transitions
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [hash, pathname]);
+
+  return null;
+}
 
 /* ═══════════════════════════════════════
    404 PAGE
@@ -81,6 +121,7 @@ function NotFound() {
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToHash />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/articles" element={<Articles />} />

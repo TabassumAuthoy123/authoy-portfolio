@@ -24,7 +24,7 @@ import {
   getAllArticles, createArticle, updateArticle, deleteArticle,
   getGalleryItems, createGalleryItem, updateGalleryItem, deleteGalleryItem,
   uploadFile, getImageUrl,
-  getDashboardAnalytics, getActivityLog, logActivity,
+  getDashboardAnalytics,
   getSettings, updateSettings,
   exportBackup, importBackup,
   changePassword,
@@ -67,13 +67,7 @@ export default function Admin() {
     setTimeout(() => setNotification(null), 3000);
   }, []);
 
-  useEffect(() => {
-    verifyToken()
-      .then(() => loadAll())
-      .catch(() => navigate('/login'));
-  }, []);
-
-  const loadAll = async () => {
+  const loadAll = useCallback(async () => {
     const safeGet = async (fn, fallback) => {
       try { const res = await fn(); return res.data; } catch { return fallback; }
     };
@@ -90,7 +84,13 @@ export default function Admin() {
     ]);
     setData({ projects: p, skills: s, experience: e, achievements: a, leadership: l, messages: m, profile: pr, articles: ar, gallery: g });
     setLoading(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    verifyToken()
+      .then(() => loadAll())
+      .catch(() => navigate('/login'));
+  }, [navigate, loadAll]);
 
   const handleLogout = () => { localStorage.removeItem('token'); navigate('/login'); };
 
@@ -1067,25 +1067,28 @@ function ClientsTab({ searchQuery, openCreate, openEdit, handleDelete, showNotif
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadClients();
-  }, [searchQuery]);
-
-  const loadClients = async () => {
+  const loadClients = useCallback(async () => {
     try {
       const res = await getClients({ search: searchQuery || undefined });
       setClients(res.data.clients || []);
     } catch { setClients([]); }
     setLoading(false);
-  };
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadClients();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [loadClients]);
 
   const handleRegenKey = async (id) => {
     if (!window.confirm('Regenerate API key? The old key will stop working immediately.')) return;
     try {
-      const res = await regenerateClientKey(id);
+      await regenerateClientKey(id);
       showNotif('New API key generated');
       loadClients();
-    } catch (err) {
+    } catch {
       showNotif('Failed to regenerate key', 'error');
     }
   };
@@ -1144,10 +1147,15 @@ function ProfileTab({ profile, onSave, showNotif }) {
     stats: Array.isArray(p.stats) ? p.stats.map(s => `${s.icon}|${s.value}|${s.label}`).join('\n') : '',
   } : empty;
 
+  const [prevProfile, setPrevProfile] = useState(profile);
   const [form, setForm] = useState(toForm(profile));
-  const [saving, setSaving] = useState(false);
 
-  useEffect(() => { setForm(toForm(profile)); }, [profile]);
+  if (profile !== prevProfile) {
+    setPrevProfile(profile);
+    setForm(toForm(profile));
+  }
+
+  const [saving, setSaving] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -1376,12 +1384,13 @@ function ProjectForm({ item, onSave }) {
 }
 
 function SkillForm({ item, onSave }) {
+  const [prevItem, setPrevItem] = useState(item);
   const [form, setForm] = useState(item || { name: '', category: 'language', order: 0 });
-  
-  useEffect(() => {
-    if (item) setForm(item);
-    else setForm({ name: '', category: 'language', order: 0 });
-  }, [item]);
+
+  if (item !== prevItem) {
+    setPrevItem(item);
+    setForm(item || { name: '', category: 'language', order: 0 });
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1814,7 +1823,7 @@ function GalleryForm({ item, onSave }) {
               try { 
                 const res = await uploadFile(fd); 
                 uploadedUrls.push(res.data.url);
-              } catch (err) { 
+              } catch { 
                 alert('Upload failed for ' + file.name); 
               }
             }

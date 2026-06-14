@@ -14,12 +14,6 @@ export default function ClientPortal() {
   const [portalData, setPortalData] = useState(null);
   const [inputKey, setInputKey] = useState('');
 
-  useEffect(() => {
-    if (apiKey) {
-      verifyAndLoadPortal(apiKey);
-    }
-  }, [apiKey]);
-
   const verifyAndLoadPortal = async (key) => {
     setLoading(true);
     setError('');
@@ -37,6 +31,15 @@ export default function ClientPortal() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (apiKey) {
+      const timer = setTimeout(() => {
+        verifyAndLoadPortal(apiKey);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [apiKey]);
 
   const handleLogin = (e) => {
     e.preventDefault();

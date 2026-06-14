@@ -135,16 +135,19 @@ export default function Navbar() {
       <div className={`nav-mobile ${open ? 'nav-mobile--open' : ''}`}>
         <div className="nav-mobile__content">
           <div className="nav-mobile__links">
-            {navLinks.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                className={`nav-mobile__link ${active === id ? 'nav-mobile__link--active' : ''}`}
-                onClick={() => scrollTo(id)}
-              >
-                <Icon size={24} />
-                {label}
-              </button>
-            ))}
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <button
+                  key={link.id}
+                  className={`nav-mobile__link ${active === link.id ? 'nav-mobile__link--active' : ''}`}
+                  onClick={() => scrollTo(link.id)}
+                >
+                  <Icon size={24} />
+                  {link.label}
+                </button>
+              );
+            })}
           </div>
 
           <div className="nav-mobile__footer">
