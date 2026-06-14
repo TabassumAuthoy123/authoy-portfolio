@@ -1,4 +1,4 @@
-# Tabassum Authoy — Commercial Portfolio CMS Platform
+# 🌟 Tabassum Authoy — Commercial Portfolio CMS Platform
 
 <div align="center">
 
@@ -8,34 +8,37 @@
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)](https://vite.dev)
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com)
 
-A **commercial-grade, production-ready** portfolio CMS with full CRUD, admin panel, B2B client management, and security hardening.
-
 </div>
 
 ---
 
-## ═══════════════════════════════════════
-##   🔐 ADMIN PANEL CREDENTIALS
-## ═══════════════════════════════════════
-
-| Field    | Value                                            |
-|----------|--------------------------------------------------|
-| **URL**  | `https://your-domain.com/login` or `http://localhost:5173/login` |
-| **Email**    | `authoy@email.com`                           |
-| **Password** | `AuthoyAdmin@2026!`                          |
-
-> ⚠️ **Change the password immediately** after first login via Admin → Security → Change Password.
+## 📌 Project Overview & Purpose
+This is a **commercial-grade, production-ready portfolio CMS platform** built for **Tabassum Mustafa Authoy**. It is designed to act as a unified hub to:
+1. **Showcase Portfolio:** Public showcase of profile information, bio, experiences, achievements, leadership activities, blog articles, and visual gallery works.
+2. **Dynamic CMS (Admin Panel):** Allow full CRUD management of the site content without editing code.
+3. **B2B Client Pipeline:** Manage enterprise clients, issue API keys, view their analytics, billing limits, and capture their pipeline contact inquiries.
+4. **Android Companion App:** A native Kotlin + Jetpack Compose mobile app connecting directly to the portfolio API.
 
 ---
 
-## ═══════════════════════════════════════
-##   🏢 B2B / B2C CLIENT PORTAL
-## ═══════════════════════════════════════
+## ⚠️ Important Deployment & Tech Stack Notice
+This platform is built on the **MERN Stack** (**MongoDB, Express, React, Node.js**). 
+* **WAMP / XAMPP / SQL / Oracle:** Because this project uses **MongoDB (NoSQL)**, it **cannot** be deployed on standard PHP/MySQL configurations (such as WAMP, XAMPP, or SQL Server/Oracle) directly.
+* **Portable Running (Docker):** To deploy and run this on any machine easily without manual installs, use **Docker**. A configured [docker-compose.yml](./docker-compose.yml) is included at the root of the project to spawn the database, frontend, and backend in one command (`docker-compose up`).
 
-| Field    | Value                                            |
-|----------|--------------------------------------------------|
-| **URL**  | `https://your-domain.com/client-portal` or `http://localhost:5173/client-portal` |
-| **Auth** | Sign in using the default seeded key `pk_authoyb2cclientkey2026` or a generated API key created in the Admin Panel |
+---
+
+## 🔑 Access & Credentials Quick Reference
+
+### 🔐 1. Admin Panel
+* **URL:** `http://localhost:5173/login` (Local) or `https://your-domain.com/login`
+* **Email:** `authoy@email.com`
+* **Password:** `AuthoyAdmin@2026!`
+* *Change password via Admin Panel → Security → Change Password.*
+
+### 🏢 2. B2B Client Portal
+* **URL:** `http://localhost:5173/client-portal` (Local) or `https://your-domain.com/client-portal`
+* **Demo API Key:** `pk_authoyb2cclientkey2026` *(or use keys generated from the Admin Panel)*
 
 ---
 
