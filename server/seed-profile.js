@@ -9,28 +9,29 @@ dotenv.config({ path: '../.env' });
 const Profile = require('./models/Profile');
 
 const profileData = {
-  name: 'Tabassum Authoy',
-  title: 'Creative Developer & Designer',
-  tagline: 'Building digital experiences that inspire.',
-  email: 'authoy@email.com',
+  name: 'Tabassum Mustafa Authoy',
+  title: 'Software Engineer & Business Development Manager',
+  tagline: 'Working at the intersection of software engineering, AI safety research, and the classical arts.',
+  email: 'tabassumauthoy123@gmail.com',
   phone: '+880 1XXX-XXXXXX',
   location: 'Dhaka, Bangladesh',
   bio: [
-    "I'm a creative developer and designer based in Bangladesh, passionate about building beautiful and functional web experiences.",
-    "I specialize in front-end development and UI/UX design, combining aesthetics with performance to deliver products that users love.",
-    "I work with HTML5, CSS3, JavaScript, React, Next.js, and Node.js to craft elegant digital experiences that inspire."
+    "I am a multidisciplinary practitioner working at the intersection of technology, research, and art. As a software engineer, aspiring AI safety researcher, and trained classical performer based in Dhaka, Bangladesh, my work focuses on bridging reliable engineering with scientific and creative exploration.",
+    "With hands-on experience spanning front-end development, travel OTA platform engineering, UI/UX collaboration, digital platform coordination, and IT-driven business operations, I specialize in technical solution design, building functional web interfaces, supporting platform operations, and coordinating between clients and development teams to deliver reliable products.",
+    "My long-term ambition is to contribute to the design of reliable and trustworthy artificial intelligence systems—particularly in reducing hallucinations and uncertainty in large language models, and bridging data-driven models with practical software architecture.",
+    "Outside of work, I am a trained classical Bangla performer at Chhayanaut Shongshkriti-Bhobon, an amateur photographer, and a traveler whose practice draws as much from the South Asian classical tradition as from contemporary computer science."
   ],
-  quote: "I craft elegant digital experiences with clean code and thoughtful design. Turning complex ideas into beautiful, intuitive interfaces.",
-  photoUrl: '/placeholder-avatar.png',
-  resumeUrl: '/Tabassum%20Authoy%20-CV.pdf',
+  quote: "I work at the intersection of software engineering, AI safety research, and the classical arts.",
+  photoUrl: '/uploads/profile.png',
+  resumeUrl: '/uploads/Tabassum_Mustafa_Authoy_CV.pdf',
   githubUrl: 'https://github.com/TabassumAuthoy123',
   linkedinUrl: 'https://linkedin.com/in/tabassum-authoy',
-  floatingTags: ['UI/UX Magic', 'Clean Code', 'Innovation'],
+  floatingTags: ['AI Safety', 'SaaS Sales', 'SaaS Dev', 'Classical Arts'],
   stats: [
-    { icon: '💼', value: '3+ Years', label: 'Experience' },
-    { icon: '💻', value: '25+', label: 'Projects' },
-    { icon: '🏆', value: '15+', label: 'Happy Clients' },
-    { icon: '🚀', value: 'Available', label: 'For Freelance' }
+    { icon: '💼', value: 'Manager', label: 'BD at SoftifyBD' },
+    { icon: '🎓', value: 'MSc / EMBA', label: 'BRAC & DU' },
+    { icon: '💻', value: 'BSc IT', label: 'First Class Hons' },
+    { icon: '🩰', value: 'Artist', label: 'Classical Performer' }
   ]
 };
 

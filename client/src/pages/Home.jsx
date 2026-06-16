@@ -6,7 +6,9 @@ import Skills from '../components/Skills';
 import Projects from '../components/Projects';
 import Experience from '../components/Experience';
 import Achievements from '../components/Achievements';
+import Booking from '../components/Booking';
 import Contact from '../components/Contact';
+import AIAssistant from '../components/AIAssistant';
 import Footer from '../components/Footer';
 
 export default function Home() {
@@ -24,8 +26,10 @@ export default function Home() {
       <Projects />
       <Experience />
       <Achievements />
+      <Booking />
       <Contact />
       <Footer />
+      <AIAssistant />
     </>
   );
 }

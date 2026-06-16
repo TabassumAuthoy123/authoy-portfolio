@@ -61,7 +61,7 @@ const seedData = async () => {
         "Outside of work, I am a trained classical Bangla performer at Chhayanaut Shongshkriti-Bhobon, an amateur photographer, and a traveler whose practice draws as much from the South Asian classical tradition as from contemporary computer science."
       ],
       quote: "I work at the intersection of software engineering, AI safety research, and the classical arts.",
-      photoUrl: '/placeholder-avatar.png',
+      photoUrl: '/uploads/profile.png',
       resumeUrl: '/uploads/Tabassum_Mustafa_Authoy_CV.pdf',
       githubUrl: 'https://github.com/TabassumAuthoy123',
       linkedinUrl: 'https://linkedin.com/in/tabassum-authoy',

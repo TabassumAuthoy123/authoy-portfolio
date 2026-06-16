@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FiMenu, FiX, FiSun, FiMoon, FiDownload, FiImage, FiBook, FiHome, FiUser, FiZap, FiFolder, FiMap, FiAward, FiMail } from 'react-icons/fi';
+import { FiMenu, FiX, FiSun, FiMoon, FiDownload, FiImage, FiBook, FiHome, FiUser, FiZap, FiFolder, FiMap, FiAward, FiMail, FiCalendar } from 'react-icons/fi';
 import { getProfile, getImageUrl } from '../api';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -10,6 +10,7 @@ const navLinks = [
   { id: 'projects', label: 'Projects', icon: FiFolder },
   { id: 'experience', label: 'Journey', icon: FiMap },
   { id: 'achievements', label: 'Achievements', icon: FiAward },
+  { id: 'booking', label: 'Booking', icon: FiCalendar },
   { id: 'contact', label: 'Contact', icon: FiMail },
 ];
 
