@@ -30,47 +30,56 @@ This platform is built on the **MERN Stack** (**MongoDB, Express, React, Node.js
 
 ## 🔑 Access & Credentials Quick Reference
 
-### 🔐 1. Admin Panel
-* **URL:** `http://localhost:5173/login` (Local) or `https://your-domain.com/login`
-* **Email:** `authoy@email.com`
-* **Password:** `AuthoyAdmin@2026!`
-* *Change password via Admin Panel → Security → Change Password.*
+| System Component | Access URL | Default Login Credentials | Role / Purpose |
+|:---|:---|:---|:---|
+| **Admin Panel** | `http://localhost:5173/login` | **Email:** `authoy@email.com`<br>**Password:** `AuthoyAdmin@2026!` | Full CMS CRUD and Client API Management |
+| **B2B Client Portal** | `http://localhost:5173/client-portal` | **Client Key:** `pk_authoyb2cclientkey2026` | Enterprise developer API analytics dashboard |
+| **API Backend** | `http://localhost:5000/api` | *Authorized Bearer token required for write endpoints* | Express core API service gateway |
 
-### 🏢 2. B2B Client Portal
-* **URL:** `http://localhost:5173/client-portal` (Local) or `https://your-domain.com/client-portal`
-* **Demo API Key:** `pk_authoyb2cclientkey2026` *(or use keys generated from the Admin Panel)*
+> [!TIP]
+> Admin login credentials can be changed in the dashboard under **Security** -> **Change Password**.
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Step-by-Step Local Deployment
 
 ### Prerequisites
-- **Node.js** 18+ 
-- **MongoDB** (local or Atlas)
-- **npm** or **yarn**
+- **Node.js** v18 or newer (v20+ recommended)
+- **MongoDB** Community Server installed and running locally, OR a **MongoDB Atlas** cloud connection string.
+- **Git**
 
-### 1. Clone & Install
+### 1. Clone & Install Dependencies
+Open your terminal (PowerShell, Command Prompt, or Bash) and run:
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/TabassumAuthoy123/authoy-portfolio.git
 cd authoy-portfolio
 
-# Install server dependencies
-cd server && npm install
+# 2. Go to the backend server folder and install dependencies
+cd server
+npm install
 
-# Install client dependencies
-cd ../client && npm install
+# 3. Go to the frontend client folder and install dependencies
+cd ../client
+npm install
 ```
 
-### 2. Configure Environment
+> [!IMPORTANT]
+> **Windows PowerShell Script Restrictions:**
+> If you receive an error in PowerShell saying `Running scripts is disabled on this system` when running `npm`, run Node wrapper commands by adding the `.cmd` extension explicitly:
+> - Use `npm.cmd install` instead of `npm install`
+> - Use `npm.cmd run dev` instead of `npm run dev`
+
+### 2. Configure Environment Files
+Create a `.env` file inside the `server/` directory:
 
 ```bash
-# Copy the example env file
+# From the project root directory:
 cp .env.example server/.env
 ```
 
-Edit `server/.env` with your values:
-
+Open `server/.env` in your code editor and configure the following parameters:
 ```env
 MONGO_URI=mongodb://127.0.0.1:27017/portfolio
 JWT_SECRET=your-super-secret-jwt-key
@@ -79,24 +88,78 @@ NODE_ENV=development
 CLIENT_URL=http://localhost:5173
 ```
 
-### 3. Seed Database & Run
+### 3. Seed the Database
+To populate the database with initial portfolio records (education, research publications, experience timeline, and admin access keys):
 
 ```bash
-# Seed initial data (from server directory)
-cd server && node seed.js
+# Run this command from the server/ folder:
+cd server
+node seed.js
+```
+*(Alternatively, you can run `node seed-profile.js` to seed the custom admin profile record directly).*
 
-# Start backend (from server directory)
+### 4. Run the Platform Locally
+To start the services locally, you will need **two terminal instances** (one for the backend, one for the frontend):
+
+#### Terminal 1: Backend Server
+```bash
+cd c:\Users\authoy-portfolio\server
+# Start Backend
 npm start
-
-# Start frontend (from client directory, in a new terminal)
-cd client && npm run dev
+# (If PowerShell scripts are blocked, run:)
+npm.cmd start
 ```
 
-- **Frontend:** http://localhost:5173
+#### Terminal 2: Frontend Client
+```bash
+cd c:\Users\authoy-portfolio\client
+# Start Frontend
+npm run dev
+# (If PowerShell scripts are blocked, run:)
+npm.cmd run dev
+```
+
+- **Frontend URL:** http://localhost:5173
 - **Backend API:** http://localhost:5000/api
-- **Admin Panel:** http://localhost:5173/login
+- **Admin Panel URL:** http://localhost:5173/login
 
 ---
+
+## 🐳 Running Locally with Docker
+If you have Docker and Docker Compose installed, you can skip the Node and MongoDB installations completely and run the entire application stacked in containerized environments:
+
+```bash
+# Run from the project root directory containing docker-compose.yml:
+docker-compose up --build
+```
+This automatically spins up:
+- MongoDB Service on port `27017`
+- Express Node server on port `5000`
+- React Vite application on port `5173`
+
+---
+
+## 🌐 Live Domain Hosting & Production Build
+
+### 1. Build the Frontend Assets
+To compile the frontend React application into optimized static HTML, CSS, and JS files:
+```bash
+cd client
+npm run build     # (Or: npm.cmd run build)
+```
+The production bundle will be generated in `client/dist/`.
+
+### 2. Hosting the Backend (Node.js & Express)
+Deploy the `server/` folder to any Node.js hosting platform (e.g., Render, Railway, Heroku, AWS EC2):
+1. Set up a free MongoDB database on [MongoDB Atlas](https://www.mongodb.com/products/platform/atlas-database).
+2. Configure environmental variables on your hosting dashboard (copying the values from `server/.env` and using the Atlas connection string in `MONGO_URI`).
+3. Ensure the start command is configured to `npm start` (which executes `node server.js`).
+
+### 3. Hosting the Frontend (React Vite)
+Deploy the `client/` folder to static web host providers (e.g., Vercel, Netlify):
+1. Vercel automatically detects Vite configurations using the root `vercel.json` and client sub-builds.
+2. Link the repository to your hosting account, set the root directory to `client`, and configure the build output folder to `dist`.
+3. Set `CLIENT_URL` pointing to your hosted domain to secure Express API requests under CORS rules.
 
 ## 🏗️ Tech Stack
 

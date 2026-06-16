@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { FiGithub, FiLinkedin } from 'react-icons/fi';
-import { getProfile } from '../api';
+import { FiGithub, FiLinkedin, FiMail, FiDownload, FiArrowRight } from 'react-icons/fi';
+import { getProfile, getImageUrl } from '../api';
 import TagCloud from 'TagCloud';
 import createGlobe from 'cobe';
 import { TypeAnimation } from 'react-type-animation';
@@ -23,6 +23,7 @@ export default function Hero() {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
   const textRef = useRef(null);
+  const [wordIndex, setWordIndex] = useState(0);
 
   const handleTextMouseMove = (e) => {
     if (!textRef.current) return;
@@ -32,8 +33,6 @@ export default function Hero() {
     textRef.current.style.setProperty("--mouse-x", `${x}px`);
     textRef.current.style.setProperty("--mouse-y", `${y}px`);
   };
-
-  const [wordIndex, setWordIndex] = useState(0);
 
   useEffect(() => {
     const wordTimer = setInterval(() => {
@@ -49,6 +48,8 @@ export default function Hero() {
   }, []);
 
   const p = profile || FALLBACK;
+  const finalPhotoUrl = p.photoUrl ? getImageUrl(p.photoUrl) : '/profile.png';
+  const resumeLink = p.resumeUrl ? getImageUrl(p.resumeUrl) : '/Tabassum_Mustafa_Authoy_CV.pdf';
 
   // Refs for Magnetic Buttons
   const magneticGitRef = useRef(null);
@@ -71,7 +72,7 @@ export default function Hero() {
   useEffect(() => {
     let phi = 0;
     const isMobile = window.innerWidth <= 768;
-    const size = isMobile ? 220 : 400;
+    const size = isMobile ? 220 : 360;
 
     const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
@@ -80,12 +81,12 @@ export default function Hero() {
       phi: 0,
       theta: 0.2,
       dark: 1, // dark theme
-      diffuse: 1.5, // slightly more diffuse
+      diffuse: 1.5,
       mapSamples: 16000,
       mapBrightness: 6,
       baseColor: [0.1, 0.1, 0.15],
-      markerColor: [0.176, 0.831, 0.749], // teal var(--accent)
-      glowColor: [0.231, 0.513, 0.964], // blue var(--primary)
+      markerColor: [0.176, 0.831, 0.749], // teal var(--primary)
+      glowColor: [0.05, 0.58, 0.53], // teal/cyan glow
       markers: [
         { location: [23.8103, 90.4125], size: 0.1 } // highlight location
       ],
@@ -101,8 +102,6 @@ export default function Hero() {
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
-    
-    // Clear container to prevent duplicate clouds on re-renders (like React StrictMode)
     container.innerHTML = '';
 
     const texts = [
@@ -113,9 +112,8 @@ export default function Hero() {
       '🔥', '☁️'
     ];
     
-    // Create the TagCloud
     TagCloud(container, texts, {
-      radius: window.innerWidth <= 768 ? 130 : 250,
+      radius: window.innerWidth <= 768 ? 120 : 220,
       maxSpeed: 'normal',
       initSpeed: 'normal',
       keep: true,
@@ -134,33 +132,35 @@ export default function Hero() {
 
   return (
     <section className="hero" id="hero">
+      {/* Glow Backdrops */}
+      <div className="hero__grid-bg"></div>
+      <div className="hero__glow hero__glow--1"></div>
+      <div className="hero__glow hero__glow--2"></div>
+
+      {/* Main Row — Mostaim-inspired Design */}
       <div className="hero__layout">
-        {/* Left — Text Content */}
+        {/* Left Column — Bio & Intro */}
         <div 
           className="hero__text" 
           ref={textRef} 
           onMouseMove={handleTextMouseMove}
         >
-          {/* Grid and Glows specifically restricted to naming section */}
-          <div className="hero__grid-bg"></div>
-          <div className="hero__glow hero__glow--1"></div>
-          <div className="hero__glow hero__glow--2"></div>
           <div className="hero__mouse-glow"></div>
 
-          <div className="hero__welcome-badge" style={{ position: "relative", zIndex: 10 }}>
+          <div className="hero__welcome-badge">
             <span className="hero__welcome-dot">●</span>
             Assalamualikum <span className="hero__sparkle" style={{ marginLeft: "6px" }}>✨</span>
           </div>
 
-          <h1 className="hero__heading" style={{ position: "relative", zIndex: 10 }}>
-            I'm <span className="hero__name-highlight">{p.name || FALLBACK.name}</span>
+          <h1 className="hero__heading">
+            I'm <span className="hero__name-highlight">{p.name}</span>
           </h1>
 
-          <div className="hero__typing-container" style={{ marginBottom: "20px" }}>
+          <div className="hero__typing-container">
             <span className="typing-prefix">{`> `}</span>
             <TypeAnimation
               sequence={[
-                p.title || FALLBACK.title,
+                p.title,
                 2000,
                 'Software Engineer',
                 2000,
@@ -177,47 +177,77 @@ export default function Hero() {
           </div>
 
           <p className="hero__desc" style={{ fontFamily: "var(--font-serif)", fontWeight: "600", color: "#f8fafc", fontSize: "1.15rem", letterSpacing: "0.01em" }}>
-            {p.tagline || FALLBACK.tagline}
+            {p.tagline}
           </p>
+
+          <div className="hero__action-btns">
+            <a href="#contact" className="hero__cta-btn">
+              Let's Talk <FiArrowRight style={{ marginLeft: '8px' }} />
+            </a>
+            <a href={resumeLink} target="_blank" rel="noopener noreferrer" className="hero__secondary-btn">
+              <FiDownload style={{ marginRight: '8px' }} /> Download CV
+            </a>
+          </div>
 
           <div className="hero__social-btns">
             <a
               ref={magneticGitRef}
-              href={p.githubUrl || FALLBACK.githubUrl}
+              href={p.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="hero__social-btn hero__social-btn--magnetic hero__social-btn--github"
               onMouseMove={(e) => handleMagneticMove(e, magneticGitRef)}
               onMouseLeave={() => handleMagneticLeave(magneticGitRef)}
             >
-              Github
+              <FiGithub style={{ marginRight: '6px' }} /> Github
             </a>
             <a
               ref={magneticLinRef}
-              href={p.linkedinUrl || FALLBACK.linkedinUrl}
+              href={p.linkedinUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="hero__social-btn hero__social-btn--magnetic hero__social-btn--linkedin"
               onMouseMove={(e) => handleMagneticMove(e, magneticLinRef)}
               onMouseLeave={() => handleMagneticLeave(magneticLinRef)}
             >
-              LinkedIn
+              <FiLinkedin style={{ marginRight: '6px' }} /> LinkedIn
             </a>
           </div>
         </div>
 
-        {/* Right — 3D Tech Sphere */}
+        {/* Right Column — Large Premium Portrait Image (Exactly like Mostaim) */}
+        <div className="hero__portrait-wrapper">
+          <div className="hero__portrait-backdrop"></div>
+          <div className="hero__portrait-frame">
+            <img 
+              src={finalPhotoUrl} 
+              alt={p.name} 
+              className="hero__portrait-img" 
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Row — Interactive Tech Deck & 3D Globe (Moved Down) */}
+      <div className="hero__bottom-deck">
+        <div className="hero__deck-info">
+          <div className="section__badge">Interactive Deck</div>
+          <h2 className="hero__deck-title">Global <span className="text-gradient">Tech Sphere</span></h2>
+          <p className="hero__deck-desc">
+            Visualizing the intersection of neural networks, software engineering dependencies, and active AI safety parameters in real time. Hover to interact with the tag sphere or spin the geolocated globe.
+          </p>
+        </div>
+
         <div className="hero__sphere-wrapper">
           <div className="cyberpunk-grid"></div>
           <div className="hologram-projector"></div>
           
-          {/* COBE Globe inside the wrapper */}
           <canvas 
             ref={canvasRef} 
             className="hero__cobe-globe"
             style={{
-              width: window.innerWidth <= 768 ? 220 : 400,
-              height: window.innerWidth <= 768 ? 220 : 400,
+              width: window.innerWidth <= 768 ? 220 : 360,
+              height: window.innerWidth <= 768 ? 220 : 360,
             }}
           />
           <div className="globe-center-text">
