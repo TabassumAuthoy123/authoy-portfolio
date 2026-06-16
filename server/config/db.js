@@ -15,7 +15,11 @@ const connectDB = async () => {
     }
 
     console.log('Detected placeholder MONGO_URI. Starting MongoDB Memory Server...');
-    const mongoServer = await MongoMemoryServer.create();
+    const mongoServer = await MongoMemoryServer.create({
+      binary: {
+        version: '6.0.14'
+      }
+    });
     mongoUri = mongoServer.getUri();
     process.env.MONGO_URI = mongoUri;
   }
