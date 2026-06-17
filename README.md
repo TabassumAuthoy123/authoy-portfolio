@@ -7,6 +7,8 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-9-47A248?logo=mongodb&logoColor=white)](https://mongodb.com)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)](https://vite.dev)
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com)
+[![GA4](https://img.shields.io/badge/GA4-Tracking-E37400?logo=googleanalytics&logoColor=white)](https://analytics.google.com)
+[![Facebook](https://img.shields.io/badge/Facebook-Pixel-1877F2?logo=facebook&logoColor=white)](https://www.facebook.com/business/tools/meta-pixel)
 
 </div>
 
@@ -15,9 +17,13 @@
 ## 📌 Project Overview & Purpose
 This is a **commercial-grade, production-ready portfolio CMS platform** built for **Tabassum Mustafa Authoy**. It is designed to act as a unified hub to:
 1. **Showcase Portfolio:** Public showcase of profile information, bio, experiences, achievements, leadership activities, blog articles, and visual gallery works.
-2. **Dynamic CMS (Admin Panel):** Allow full CRUD management of the site content without editing code.
-3. **B2B Client Pipeline:** Manage enterprise clients, issue API keys, view their analytics, billing limits, and capture their pipeline contact inquiries.
-4. **Android Companion App:** A native Kotlin + Jetpack Compose mobile app connecting directly to the portfolio API.
+2. **Dynamic CMS (Admin Panel):** Allow full CRUD management of the site content without editing code. Includes a **Live Preview** system to see how changes look before publishing.
+3. **Email Notifications:** Automatic email delivery to `tabassumauthoy12@gmail.com` for every contact form submission and booking request.
+4. **Digital Marketing & Analytics:** Built-in Google Analytics 4, Facebook Pixel, LinkedIn Insight Tag integration — configurable from the admin panel. Visitor analytics tracked in a dedicated dashboard.
+5. **Lead Generation:** Smart exit-intent popup with configurable CTA, UTM parameter capture, and campaign attribution.
+6. **B2B Client Pipeline:** Manage enterprise clients, issue API keys, view their analytics, billing limits, and capture pipeline contact inquiries.
+7. **SEO Optimization:** Structured data (JSON-LD Person + WebSite schemas), dynamic meta tags, Open Graph/Twitter cards, canonical URLs, sitemap support.
+8. **Android Companion App:** A native Kotlin + Jetpack Compose mobile app connecting directly to the portfolio API.
 
 ---
 
@@ -32,7 +38,7 @@ This platform is built on the **MERN Stack** (**MongoDB, Express, React, Node.js
 
 | System Component | Access URL | Default Login Credentials | Role / Purpose |
 |:---|:---|:---|:---|
-| **Admin Panel** | `http://localhost:5173/login` | **Email:** `authoy@email.com`<br>**Password:** `AuthoyAdmin@2026!` | Full CMS CRUD and Client API Management |
+| **Admin Panel** | `http://localhost:5173/login` | **Email:** `authoy@email.com`<br>**Password:** `AuthoyAdmin@2026!` | Full CMS CRUD, Preview, Analytics & Client Management |
 | **B2B Client Portal** | `http://localhost:5173/client-portal` | **Client Key:** `pk_authoyb2cclientkey2026` | Enterprise developer API analytics dashboard |
 | **API Backend** | `http://localhost:5000/api` | *Authorized Bearer token required for write endpoints* | Express core API service gateway |
 
@@ -81,12 +87,30 @@ cp .env.example server/.env
 
 Open `server/.env` in your code editor and configure the following parameters:
 ```env
+# ── Database ──
 MONGO_URI=mongodb://127.0.0.1:27017/portfolio
 JWT_SECRET=your-super-secret-jwt-key
 PORT=5000
 NODE_ENV=development
 CLIENT_URL=http://localhost:5173
+
+# ── Email Notifications ──
+EMAIL_USER=tabassumauthoy12@gmail.com
+EMAIL_PASS=               # Gmail App Password (see below)
+NOTIFICATION_EMAIL=tabassumauthoy12@gmail.com
+
+# ── Analytics & Marketing (also configurable in Admin Settings) ──
+GA4_MEASUREMENT_ID=       # e.g. G-XXXXXXXXXX
+FACEBOOK_PIXEL_ID=        # e.g. 123456789012345
+LINKEDIN_PARTNER_ID=      # e.g. 1234567
 ```
+
+#### 📧 How to Enable Email Notifications
+To receive emails at `tabassumauthoy12@gmail.com` when someone books an appointment or sends a contact message:
+1. Go to [Google Account → Security](https://myaccount.google.com/security)
+2. Enable **2-Step Verification**
+3. Go to **App Passwords** → Generate a password for "Mail"
+4. Copy the 16-character app password and paste it into `EMAIL_PASS` in `server/.env`
 
 ### 3. Seed the Database
 To populate the database with initial portfolio records (education, research publications, experience timeline, and admin access keys):
@@ -169,6 +193,8 @@ Deploy the `client/` folder to static web host providers (e.g., Vercel, Netlify)
 | Backend     | Express 5 + Mongoose 9 + JWT       |
 | Database    | MongoDB (Atlas or Local)            |
 | File Upload | Cloudinary + Multer                 |
+| Email       | Nodemailer (Gmail SMTP)             |
+| Analytics   | GA4 + Facebook Pixel + LinkedIn Insight |
 | Security    | Helmet + Rate Limiting + Sanitize   |
 | Validation  | express-validator                   |
 | Deployment  | Vercel (serverless)                 |
@@ -183,16 +209,30 @@ authoy-portfolio/
 │   ├── src/
 │   │   ├── api/               # Axios API client
 │   │   ├── components/        # Reusable UI components
+│   │   │   ├── AdminPreview.jsx    # Live section preview for CMS
+│   │   │   ├── Analytics.jsx       # GA4/Pixel/LinkedIn tracking
+│   │   │   ├── LeadPopup.jsx       # Smart lead generation popup
+│   │   │   ├── SEOHead.jsx         # Dynamic meta tags
+│   │   │   └── ...                 # Hero, About, Skills, Projects, etc.
+│   │   ├── hooks/
+│   │   │   └── useScrollAnimation.js  # IntersectionObserver scroll animations
 │   │   ├── pages/             # Page-level components
-│   │   ├── App.jsx            # Router setup
-│   │   └── index.css          # Global styles
-│   ├── index.html             # SEO-optimized entry
+│   │   │   ├── Admin.jsx      # Full CMS admin panel
+│   │   │   └── Home.jsx       # B2C portfolio homepage
+│   │   ├── App.jsx            # Router setup + Analytics integration
+│   │   └── index.css          # Global styles + scroll animations
+│   ├── index.html             # SEO-optimized entry (JSON-LD, OG, Twitter)
 │   └── vite.config.js         # Build configuration
 ├── server/                    # Express backend
 │   ├── config/                # Database config
 │   ├── middleware/            # Auth, error handling, rate limiting, validation
 │   ├── models/                # Mongoose schemas (13 models)
+│   │   └── SiteSettings.js    # SEO, analytics IDs, lead magnet config
 │   ├── routes/                # API endpoints (15 route files)
+│   │   ├── analytics.js       # Pageview tracking + visitor stats
+│   │   └── contact.js         # Contact form + email notification
+│   ├── utils/
+│   │   └── mailer.js          # Nodemailer Gmail transporter
 │   ├── seed.js                # Database seeder
 │   └── server.js              # Express app entry
 ├── .env.example               # Environment template
@@ -217,18 +257,68 @@ authoy-portfolio/
 
 ## 📊 Admin Panel Features
 
-| Feature              | Description                                         |
-|----------------------|-----------------------------------------------------|
-| **Dashboard**        | Analytics cards, activity log, quick actions         |
+| Feature              | Description                                                |
+|----------------------|------------------------------------------------------------|
+| **Dashboard**        | Analytics cards, activity log, quick actions                |
+| **Live Preview**     | Real-time preview of all B2C sections with live data        |
+| **Visitor Analytics**| Pageviews, top pages, traffic sources (7d/14d/30d)          |
 | **Content CRUD**     | Projects, Skills, Experience, Achievements, Articles, Gallery |
-| **Messages**         | Contact form messages with read/unread status        |
-| **B2B Clients**      | Client management with API key generation            |
-| **Site Settings**    | SEO, branding, social links, feature toggles         |
-| **Security**         | Password change from admin panel                     |
-| **Backup/Restore**   | Full database export & import (JSON)                 |
-| **Search/Filter**    | Global search on all data tables                     |
-| **Activity Log**     | Track all CRUD operations (auto-expires 90 days)     |
-| **Theme Toggle**     | Dark/Light mode                                      |
+| **Messages**         | Contact form messages with read/unread + email notification |
+| **B2B Clients**      | Client management with API key generation                   |
+| **Site Settings**    | SEO, branding, social links, feature toggles, analytics IDs |
+| **Security**         | Password change from admin panel                            |
+| **Backup/Restore**   | Full database export & import (JSON)                        |
+| **Search/Filter**    | Global search on all data tables                            |
+| **Activity Log**     | Track all CRUD operations (auto-expires 90 days)            |
+| **Theme Toggle**     | Dark/Light mode with localStorage persistence               |
+
+---
+
+## 📈 Digital Marketing & Analytics
+
+### Tracking Integrations (Admin → Site Settings)
+| Platform | Field in Settings | What It Tracks |
+|----------|------------------|----------------|
+| **Google Analytics 4** | `GA4 Measurement ID` | Pageviews, events, user demographics |
+| **Facebook Pixel** | `Facebook Pixel ID` | PageView, Lead events, ad conversions |
+| **LinkedIn Insight Tag** | `LinkedIn Partner ID` | Professional audience tracking, campaign attribution |
+
+### Lead Generation
+- **Exit-intent popup** — Appears when user's mouse leaves the viewport, or after 30 seconds
+- **UTM capture** — Stores `utm_source`, `utm_medium`, `utm_campaign` in sessionStorage
+- **Lead tracking** — Fires `Lead` event on Facebook Pixel + `generate_lead` on GA4
+
+### Visitor Analytics Dashboard (Admin → Visitor Analytics)
+- Total pageviews with time-range selector (7d, 14d, 30d)
+- Top pages visited with bar visualization
+- Traffic sources / referrers
+- All data stored in your own MongoDB (no third-party dependency)
+
+---
+
+## 📧 Email Notification System
+
+When a visitor submits the **contact form** or **books an appointment**, the system:
+1. Saves the message to MongoDB
+2. Sends a beautifully formatted HTML email to `tabassumauthoy12@gmail.com`
+3. Includes sender name, email, message content, and a LinkedIn reply link
+4. Uses Gmail SMTP via Nodemailer (requires Gmail App Password)
+
+> [!NOTE]
+> Email sending will silently skip if `EMAIL_PASS` is not configured — it won't break the contact form.
+
+---
+
+## 🎨 B2C Frontend Features
+
+- **Dark/Light Mode** — Toggle in navbar, persists via localStorage, affects all sections
+- **Scroll Animations** — IntersectionObserver-based reveal with staggered delays
+- **Hover Effects** — Card lift animations, pulse glow CTAs
+- **Responsive Design** — Mobile-first with breakpoints at 576px, 768px, 992px, 1200px
+- **Interactive Skills Cloud** — 3D sphere with tech stack icons
+- **Sticky Project Cards** — Stack-style scrolling project showcase
+- **Booking Calendar** — Inline appointment scheduler
+- **AI Assistant** — Floating drawer with conversational interface
 
 ---
 
@@ -245,8 +335,9 @@ authoy-portfolio/
 | GET    | `/api/articles`        | Published articles     |
 | GET    | `/api/gallery`         | Gallery items          |
 | GET    | `/api/profile`         | Profile data           |
-| GET    | `/api/settings`        | Site settings          |
-| POST   | `/api/contact`         | Send contact message   |
+| GET    | `/api/settings`        | Site settings (SEO, analytics IDs) |
+| POST   | `/api/contact`         | Send contact message (+ email notification) |
+| POST   | `/api/analytics/pageview` | Log visitor pageview  |
 | GET    | `/api/health`          | Health check           |
 
 ### Admin (requires `Authorization: Bearer <token>`)
@@ -258,6 +349,7 @@ authoy-portfolio/
 | POST   | `/api/auth/forgot-password`    | Send OTP                 |
 | POST   | `/api/auth/reset-password`     | Reset with OTP           |
 | GET    | `/api/analytics/dashboard`     | Dashboard stats          |
+| GET    | `/api/analytics/visitors`      | Visitor analytics (top pages, referrers) |
 | GET    | `/api/backup/export`           | Export DB as JSON        |
 | POST   | `/api/backup/import`           | Import JSON backup       |
 | CRUD   | `/api/projects`                | Projects management      |
@@ -282,6 +374,9 @@ authoy-portfolio/
    - `JWT_SECRET` — Strong random secret
    - `NODE_ENV=production`
    - `CLIENT_URL` — Your domain (e.g., `https://tabassumauthoy.me`)
+   - `EMAIL_USER` — Gmail address
+   - `EMAIL_PASS` — Gmail App Password
+   - `NOTIFICATION_EMAIL` — Email to receive contact notifications
 4. Deploy!
 
 ### Custom Domain Setup
@@ -294,20 +389,24 @@ authoy-portfolio/
 
 See [.env.example](./.env.example) for all required variables.
 
-| Variable                | Required | Description                         |
-|-------------------------|----------|-------------------------------------|
-| `MONGO_URI`             | ✅       | MongoDB connection string           |
-| `JWT_SECRET`            | ✅       | JWT signing secret                  |
-| `PORT`                  | ❌       | Server port (default: 5000)         |
-| `NODE_ENV`              | ❌       | Environment (development/production)|
-| `CLIENT_URL`            | ❌       | Frontend URL for CORS               |
-| `RATE_LIMIT_WINDOW`     | ❌       | Rate limit window in ms             |
-| `RATE_LIMIT_MAX`        | ❌       | Max requests per window             |
-| `CLOUDINARY_CLOUD_NAME` | ❌       | Cloudinary cloud name               |
-| `CLOUDINARY_API_KEY`    | ❌       | Cloudinary API key                  |
-| `CLOUDINARY_API_SECRET` | ❌       | Cloudinary API secret               |
-| `EMAIL_USER`            | ❌       | Gmail for OTP sending               |
-| `EMAIL_PASS`            | ❌       | Gmail app password                  |
+| Variable                | Required | Description                            |
+|-------------------------|----------|----------------------------------------|
+| `MONGO_URI`             | ✅       | MongoDB connection string              |
+| `JWT_SECRET`            | ✅       | JWT signing secret                     |
+| `PORT`                  | ❌       | Server port (default: 5000)            |
+| `NODE_ENV`              | ❌       | Environment (development/production)   |
+| `CLIENT_URL`            | ❌       | Frontend URL for CORS                  |
+| `RATE_LIMIT_WINDOW`     | ❌       | Rate limit window in ms                |
+| `RATE_LIMIT_MAX`        | ❌       | Max requests per window                |
+| `CLOUDINARY_CLOUD_NAME` | ❌       | Cloudinary cloud name                  |
+| `CLOUDINARY_API_KEY`    | ❌       | Cloudinary API key                     |
+| `CLOUDINARY_API_SECRET` | ❌       | Cloudinary API secret                  |
+| `EMAIL_USER`            | ❌       | Gmail for notifications & OTP          |
+| `EMAIL_PASS`            | ❌       | Gmail App Password                     |
+| `NOTIFICATION_EMAIL`    | ❌       | Where to send contact notifications    |
+| `GA4_MEASUREMENT_ID`    | ❌       | Google Analytics 4 Measurement ID      |
+| `FACEBOOK_PIXEL_ID`     | ❌       | Facebook Pixel ID                      |
+| `LINKEDIN_PARTNER_ID`   | ❌       | LinkedIn Insight Tag Partner ID        |
 
 ---
 
@@ -346,4 +445,4 @@ $env:JAVA_HOME="C:\Users\SBD - Commercial 23\.android\jdk17\jdk-17.0.19+10"
 
 ## 📄 License
 
-© 2026 Tabassum Authoy. All rights reserved.
+© 2026 Tabassum Mustafa Authoy. All rights reserved.

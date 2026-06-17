@@ -17,14 +17,13 @@ const Client = require('./models/Client');
 const Article = require('./models/Article');
 const GalleryItem = require('./models/GalleryItem');
 
+const connectDB = require('./config/db');
+
 const seedData = async () => {
   try {
-    const mongoUri = process.env.MONGO_URI;
-    if (!mongoUri) {
-      throw new Error('MONGO_URI is not defined in process.env');
-    }
-    await mongoose.connect(mongoUri);
-    console.log('Connected to MongoDB:', mongoUri);
+    await connectDB();
+    console.log('Database connected for seeding.');
+
 
     // Clear existing data in all collections
     await Admin.deleteMany({});

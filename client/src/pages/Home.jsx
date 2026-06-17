@@ -10,8 +10,17 @@ import Booking from '../components/Booking';
 import Contact from '../components/Contact';
 import AIAssistant from '../components/AIAssistant';
 import Footer from '../components/Footer';
+import LeadPopup from '../components/LeadPopup';
+import { getSettings } from '../api';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
+  const [siteSettings, setSiteSettings] = useState(null);
+
+  useEffect(() => {
+    getSettings().then(res => setSiteSettings(res.data)).catch(() => {});
+  }, []);
+
   return (
     <>
       <SEOHead 
@@ -30,6 +39,7 @@ export default function Home() {
       <Contact />
       <Footer />
       <AIAssistant />
+      <LeadPopup settings={siteSettings} />
     </>
   );
 }

@@ -2,6 +2,7 @@ const express = require('express');
 const auth = require('../middleware/auth');
 const Message = require('../models/Message');
 const { validate, contactRules } = require('../middleware/validator');
+const { sendContactNotification } = require('../utils/mailer');
 const router = express.Router();
 
 // POST /api/contact - public (visitors send messages)
@@ -20,6 +21,11 @@ router.post('/', validate(contactRules), async (req, res) => {
       message,
       clientId: clientId || null
     });
+
+    // Send email notification to tabassumauthoy12@gmail.com
+    // This runs async — does not block the API response
+    sendContactNotification({ name, email, message }).catch(console.error);
+
     res.status(201).json({ message: 'Message sent successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -59,4 +65,3 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 module.exports = router;
-

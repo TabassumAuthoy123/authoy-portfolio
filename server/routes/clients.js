@@ -61,6 +61,33 @@ router.get('/portal/me', async (req, res) => {
   }
 });
 
+// POST /api/clients/portal/regenerate-key — Let B2B client regenerate their own key via old key
+router.post('/portal/regenerate-key', async (req, res) => {
+  try {
+    const apiKey = req.headers['x-api-key'];
+    if (!apiKey) {
+      return res.status(401).json({ message: 'API Key is required' });
+    }
+
+    const client = await Client.findOne({ apiKey });
+    if (!client) {
+      return res.status(401).json({ message: 'Invalid API Key' });
+    }
+
+    const newKey = 'pk_' + crypto.randomBytes(24).toString('hex');
+    client.apiKey = newKey;
+    await client.save();
+
+    res.json({
+      message: 'API Key regenerated successfully. Save the new key immediately as your old key is now invalidated.',
+      apiKey: newKey
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 // GET /api/clients/:id — Get single client
 router.get('/:id', auth, async (req, res) => {
   try {

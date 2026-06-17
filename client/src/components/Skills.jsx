@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { 
   FiCode, FiLayers, FiDatabase, FiCpu, FiTool 
 } from 'react-icons/fi';
@@ -148,9 +148,10 @@ function SkillCard({ cat }) {
    Main Skills Component
    ───────────────────────── */
 export default function Skills() {
-  const [skills, setSkills] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
+  const [skills, setSkills] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const sectionRef = useRef(null);
 
   React.useEffect(() => {
     getSkills()
@@ -163,6 +164,22 @@ export default function Skills() {
         setError(err.message);
         setLoading(false);
       });
+  }, []);
+
+  // Scroll animation observer
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        el.querySelectorAll('.animate-on-scroll').forEach((child, i) => {
+          setTimeout(() => child.classList.add('visible'), i * 80);
+        });
+        observer.unobserve(el);
+      }
+    }, { threshold: 0.08 });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   // Group skills by category based on fetched data
@@ -185,10 +202,10 @@ export default function Skills() {
   }).filter(cat => cat.skills.length > 0);
 
   return (
-    <section className="section" id="strengths">
+    <section className="section" id="strengths" ref={sectionRef}>
       <div className="container">
         {/* Section Header */}
-        <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto 20px' }}>
+        <div className="animate-on-scroll" style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto 20px' }}>
           <div className="section__badge">Skills</div>
           <h2 className="section__title">
             Technologies I <span className="text-gradient">work with</span>
@@ -207,9 +224,11 @@ export default function Skills() {
 
         {/* Skills Cards Grid */}
         {!loading && !error && (
-          <div className="skills__grid">
+          <div className="skills__grid stagger-children">
             {groupedSkills.map((cat) => (
-              <SkillCard key={cat.title} cat={cat} />
+              <div key={cat.title} className="animate-on-scroll hover-lift">
+                <SkillCard cat={cat} />
+              </div>
             ))}
           </div>
         )}

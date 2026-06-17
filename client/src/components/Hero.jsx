@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FiGithub, FiLinkedin, FiMail, FiDownload, FiArrowRight } from 'react-icons/fi';
+import { FiGithub, FiLinkedin, FiMail, FiDownload, FiArrowRight, FiFacebook, FiTwitter, FiInstagram } from 'react-icons/fi';
 import { getProfile, getImageUrl } from '../api';
 import TagCloud from 'TagCloud';
 import createGlobe from 'cobe';
@@ -12,27 +12,20 @@ const FALLBACK = {
   currentLearning: 'AI Safety & Deep Learning',
   githubUrl: 'https://github.com/TabassumAuthoy123',
   linkedinUrl: 'https://linkedin.com/in/tabassum-authoy',
+  facebookUrl: 'https://facebook.com/tabassum.authoy', // Added fallbacks
+  twitterUrl: 'https://twitter.com/tabassum_authoy',
+  instagramUrl: 'https://instagram.com/tabassum_authoy',
   floatingTags: ['AI Safety', 'SaaS Sales', 'SaaS Dev', 'Classical Arts'],
   yearsOfExperience: 3,
 };
 
-const cyclingWords = ['PLANNING','LOGIC','TECHNOLOGY','INNOVATION'];
+const cyclingWords = ['PLANNING', 'LOGIC', 'TECHNOLOGY', 'INNOVATION'];
 
 export default function Hero() {
   const [profile, setProfile] = useState(null);
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
-  const textRef = useRef(null);
   const [wordIndex, setWordIndex] = useState(0);
-
-  const handleTextMouseMove = (e) => {
-    if (!textRef.current) return;
-    const rect = textRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    textRef.current.style.setProperty("--mouse-x", `${x}px`);
-    textRef.current.style.setProperty("--mouse-y", `${y}px`);
-  };
 
   useEffect(() => {
     const wordTimer = setInterval(() => {
@@ -51,28 +44,13 @@ export default function Hero() {
   const finalPhotoUrl = p.photoUrl ? getImageUrl(p.photoUrl) : '/profile.png';
   const resumeLink = p.resumeUrl ? getImageUrl(p.resumeUrl) : '/Tabassum_Mustafa_Authoy_CV.pdf';
 
-  // Refs for Magnetic Buttons
-  const magneticGitRef = useRef(null);
-  const magneticLinRef = useRef(null);
-
-  const handleMagneticMove = (e, ref) => {
-    if (!ref.current) return;
-    const { left, top, width, height } = ref.current.getBoundingClientRect();
-    const x = e.clientX - left - width / 2;
-    const y = e.clientY - top - height / 2;
-    ref.current.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
-  };
-
-  const handleMagneticLeave = (ref) => {
-    if (!ref.current) return;
-    ref.current.style.transform = `translate(0px, 0px)`;
-  };
-
   // Globe Effect (cobe)
   useEffect(() => {
     let phi = 0;
     const isMobile = window.innerWidth <= 768;
     const size = isMobile ? 220 : 360;
+
+    if (!canvasRef.current) return;
 
     const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
@@ -88,7 +66,7 @@ export default function Hero() {
       markerColor: [0.176, 0.831, 0.749], // teal var(--primary)
       glowColor: [0.05, 0.58, 0.53], // teal/cyan glow
       markers: [
-        { location: [23.8103, 90.4125], size: 0.1 } // highlight location
+        { location: [23.8103, 90.4125], size: 0.1 } // Dhaka highlight location
       ],
       onRender: (state) => {
         state.phi = phi;
@@ -99,6 +77,7 @@ export default function Hero() {
     return () => globe.destroy();
   }, []);
 
+  // TagCloud effect
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
@@ -131,104 +110,103 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="hero" id="hero">
-      {/* Glow Backdrops */}
-      <div className="hero__grid-bg"></div>
-      <div className="hero__glow hero__glow--1"></div>
-      <div className="hero__glow hero__glow--2"></div>
+    <section className="hero-section" id="hero">
+      {/* Background gradients */}
+      <div className="hero-bg-gradient"></div>
+      <div className="hero-ambient-glow hero-ambient-glow--1"></div>
+      <div className="hero-ambient-glow hero-ambient-glow--2"></div>
+      <div className="hero-grid-lines"></div>
 
-      {/* Main Row — Mostaim-inspired Design */}
-      <div className="hero__layout">
-        {/* Left Column — Bio & Intro */}
-        <div 
-          className="hero__text" 
-          ref={textRef} 
-          onMouseMove={handleTextMouseMove}
-        >
-          <div className="hero__mouse-glow"></div>
+      <div className="hero-container">
+        <div className="hero-row">
+          {/* Left Column: Text & Intro */}
+          <div className="hero-text-col animate-slide-up">
+            {/* Greeting badge */}
+            <div className="hero-badge">
+              <span className="hero-badge-emoji">👋</span>
+              <span className="hero-badge-text">Hello,</span>
+            </div>
 
-          <div className="hero__welcome-badge">
-            <span className="hero__welcome-dot">●</span>
-            Assalamualikum <span className="hero__sparkle" style={{ marginLeft: "6px" }}>✨</span>
+            {/* Name H2 */}
+            <h2 className="hero-name-title">{p.name}</h2>
+
+            {/* Main H1 heading */}
+            <h1 className="hero-main-title">
+              Technology. <span className="text-gradient">Strategy.</span> Results.
+            </h1>
+
+            {/* Typing subtitle / role */}
+            <div className="hero-typing-box">
+              <span className="hero-typing-prefix">{`> `}</span>
+              <TypeAnimation
+                sequence={[
+                  p.title,
+                  2000,
+                  'Software Engineer',
+                  2000,
+                  'AI Safety Researcher',
+                  2000,
+                  'Business Development Manager',
+                  2000,
+                ]}
+                wrapper="span"
+                speed={50}
+                className="hero-typing-text"
+                repeat={Infinity}
+              />
+            </div>
+
+            {/* Tagline / Subtitle */}
+            <p className="hero-description">
+              {p.tagline}
+            </p>
+
+            {/* Action Buttons */}
+            <div className="hero-cta-row">
+              <a href="#contact" className="hero-primary-btn group">
+                <span>Let's Talk</span>
+                <FiArrowRight className="hero-primary-btn-icon group-hover:translate-x-1" />
+              </a>
+              <a href={resumeLink} target="_blank" rel="noopener noreferrer" className="hero-secondary-btn">
+                <FiDownload style={{ marginRight: '8px' }} />
+                <span>Download CV</span>
+              </a>
+            </div>
+
+            {/* Social Icons row */}
+            <div className="hero-socials-row">
+              <a href={p.linkedinUrl} target="_blank" rel="noopener noreferrer" className="hero-social-card" aria-label="LinkedIn">
+                <FiLinkedin className="hero-social-card-icon" />
+              </a>
+              <a href={p.githubUrl} target="_blank" rel="noopener noreferrer" className="hero-social-card" aria-label="GitHub">
+                <FiGithub className="hero-social-card-icon" />
+              </a>
+              <a href={`mailto:${p.email || 'tabassumauthoy123@gmail.com'}`} className="hero-social-card" aria-label="Email">
+                <FiMail className="hero-social-card-icon" />
+              </a>
+              <a href={p.facebookUrl || 'https://facebook.com'} target="_blank" rel="noopener noreferrer" className="hero-social-card" aria-label="Facebook">
+                <FiFacebook className="hero-social-card-icon" />
+              </a>
+              <a href={p.twitterUrl || 'https://twitter.com'} target="_blank" rel="noopener noreferrer" className="hero-social-card" aria-label="Twitter">
+                <FiTwitter className="hero-social-card-icon" />
+              </a>
+            </div>
           </div>
 
-          <h1 className="hero__heading">
-            I'm <span className="hero__name-highlight">{p.name}</span>
-          </h1>
-
-          <div className="hero__typing-container">
-            <span className="typing-prefix">{`> `}</span>
-            <TypeAnimation
-              sequence={[
-                p.title,
-                2000,
-                'Software Engineer',
-                2000,
-                'AI Safety Researcher',
-                2000,
-                'Business Development Manager',
-                2000,
-              ]}
-              wrapper="span"
-              speed={50}
-              className="hero__typing-text"
-              repeat={Infinity}
-            />
-          </div>
-
-          <p className="hero__desc" style={{ fontFamily: "var(--font-serif)", fontWeight: "600", color: "#f8fafc", fontSize: "1.15rem", letterSpacing: "0.01em" }}>
-            {p.tagline}
-          </p>
-
-          <div className="hero__action-btns">
-            <a href="#contact" className="hero__cta-btn">
-              Let's Talk <FiArrowRight style={{ marginLeft: '8px' }} />
-            </a>
-            <a href={resumeLink} target="_blank" rel="noopener noreferrer" className="hero__secondary-btn">
-              <FiDownload style={{ marginRight: '8px' }} /> Download CV
-            </a>
-          </div>
-
-          <div className="hero__social-btns">
-            <a
-              ref={magneticGitRef}
-              href={p.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hero__social-btn hero__social-btn--magnetic hero__social-btn--github"
-              onMouseMove={(e) => handleMagneticMove(e, magneticGitRef)}
-              onMouseLeave={() => handleMagneticLeave(magneticGitRef)}
-            >
-              <FiGithub style={{ marginRight: '6px' }} /> Github
-            </a>
-            <a
-              ref={magneticLinRef}
-              href={p.linkedinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hero__social-btn hero__social-btn--magnetic hero__social-btn--linkedin"
-              onMouseMove={(e) => handleMagneticMove(e, magneticLinRef)}
-              onMouseLeave={() => handleMagneticLeave(magneticLinRef)}
-            >
-              <FiLinkedin style={{ marginRight: '6px' }} /> LinkedIn
-            </a>
-          </div>
-        </div>
-
-        {/* Right Column — Large Premium Portrait Image (Exactly like Mostaim) */}
-        <div className="hero__portrait-wrapper">
-          <div className="hero__portrait-backdrop"></div>
-          <div className="hero__portrait-frame">
-            <img 
-              src={finalPhotoUrl} 
-              alt={p.name} 
-              className="hero__portrait-img" 
-            />
+          {/* Right Column: Premium Portrait Image */}
+          <div className="hero-image-col animate-fade-in">
+            <div className="hero-image-wrapper">
+              <img 
+                src={finalPhotoUrl} 
+                alt={p.name} 
+                className="hero-portrait-img" 
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Row — Interactive Tech Deck & 3D Globe (Moved Down) */}
+      {/* Preserved Bottom Row: Interactive Tech Deck & 3D Globe */}
       <div className="hero__bottom-deck">
         <div className="hero__deck-info">
           <div className="section__badge">Interactive Deck</div>

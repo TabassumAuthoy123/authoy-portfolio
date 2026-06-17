@@ -8,9 +8,10 @@ import {
   FiGrid, FiMenu, FiChevronLeft, FiActivity, FiSettings,
   FiDownload, FiUpload, FiKey, FiLock, FiUsers, FiSearch,
   FiTrendingUp, FiClock, FiRefreshCw, FiDatabase, FiCopy,
-  FiExternalLink
+  FiExternalLink, FiMonitor, FiBarChart2
 } from 'react-icons/fi';
 import ReactQuill from 'react-quill-new';
+import AdminPreview from '../components/AdminPreview';
 import 'react-quill-new/dist/quill.snow.css';
 import {
   verifyToken,
@@ -136,6 +137,7 @@ export default function Admin() {
       title: 'MAIN',
       items: [
         { key: 'dashboard', label: 'Dashboard', icon: <FiGrid /> },
+        { key: 'preview', label: 'Live Preview', icon: <FiMonitor /> },
       ],
     },
     {
@@ -155,6 +157,7 @@ export default function Admin() {
       title: 'BUSINESS',
       items: [
         { key: 'clients', label: 'Clients (B2B)', icon: <FiUsers /> },
+        { key: 'analytics', label: 'Visitor Analytics', icon: <FiBarChart2 /> },
       ],
     },
     {
@@ -286,6 +289,16 @@ export default function Admin() {
           {/* ── DASHBOARD ── */}
           {tab === 'dashboard' && (
             <DashboardTab data={data} navigate={navigate} unreadCount={unreadCount} />
+          )}
+
+          {/* ── LIVE PREVIEW ── */}
+          {tab === 'preview' && (
+            <AdminPreview />
+          )}
+
+          {/* ── VISITOR ANALYTICS ── */}
+          {tab === 'analytics' && (
+            <VisitorAnalyticsTab />
           )}
 
           {/* ── PROFILE ── */}
@@ -857,8 +870,23 @@ function SettingsTab({ showNotif }) {
             <input className="ta-form-input" value={settings.siteKeywords || ''} onChange={e => set('siteKeywords', e.target.value)} placeholder="portfolio, developer, react" />
           </div>
           <div className="ta-form-group">
-            <label className="ta-form-label">Google Analytics ID</label>
+            <label className="ta-form-label">Google Analytics 4 ID</label>
             <input className="ta-form-input" value={settings.googleAnalyticsId || ''} onChange={e => set('googleAnalyticsId', e.target.value)} placeholder="G-XXXXXXXXXX" />
+            <span className="ta-form-hint">Get from: Google Analytics → Admin → Data Streams → Measurement ID</span>
+          </div>
+          <div className="ta-form-group">
+            <label className="ta-form-label">Facebook Pixel ID</label>
+            <input className="ta-form-input" value={settings.facebookPixelId || ''} onChange={e => set('facebookPixelId', e.target.value)} placeholder="123456789012345" />
+            <span className="ta-form-hint">Get from: Facebook Events Manager → Pixels → Pixel ID</span>
+          </div>
+          <div className="ta-form-group">
+            <label className="ta-form-label">LinkedIn Partner ID (Insight Tag)</label>
+            <input className="ta-form-input" value={settings.linkedinPartnerId || ''} onChange={e => set('linkedinPartnerId', e.target.value)} placeholder="1234567" />
+            <span className="ta-form-hint">Get from: LinkedIn Campaign Manager → Insight Tag → Partner ID</span>
+          </div>
+          <div className="ta-form-group">
+            <label className="ta-form-label">Canonical URL</label>
+            <input className="ta-form-input" value={settings.canonicalUrl || ''} onChange={e => set('canonicalUrl', e.target.value)} placeholder="https://tabassumauthoy.me" />
           </div>
         </div>
       </div>
@@ -1053,6 +1081,118 @@ function BackupTab({ showNotif }) {
             <input type="file" accept=".json" onChange={handleImport} disabled={importing} />
             {importing && <span style={{ fontSize: '0.82rem' }}>Importing...</span>}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+/* ═══════════════════════════════════════
+   VISITOR ANALYTICS TAB
+   ═══════════════════════════════════════ */
+function VisitorAnalyticsTab() {
+  const [stats, setStats] = useState(null);
+  const [days, setDays] = useState(30);
+  const [loading, setLoading] = useState(true);
+
+  const loadStats = useCallback(async (d) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/analytics/visitors?days=${d}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      const data = await res.json();
+      setStats(data);
+    } catch {
+      setStats(null);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { loadStats(days); }, [days, loadStats]);
+
+  if (loading) return <div className="ta-loading"><div className="ta-spinner" />Loading visitor data...</div>;
+
+  const totalVisits = stats?.totalVisits || 0;
+  const topPages = stats?.topPages || [];
+  const topRefs = stats?.topReferrers || [];
+
+  return (
+    <div style={{ display: 'grid', gap: 24 }}>
+      <div className="ta-table-header" style={{ background: 'var(--ta-surface)', border: '1px solid var(--ta-border)', borderRadius: 10, padding: '16px 20px' }}>
+        <div>
+          <h3 style={{ margin: 0 }}>📊 Visitor Analytics</h3>
+          <p style={{ margin: '4px 0 0', color: 'var(--ta-text-secondary)', fontSize: '0.85rem' }}>Pageview tracking from your portfolio site</p>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {[7, 14, 30].map(d => (
+            <button key={d} className={`ta-btn ta-btn--sm ${days === d ? 'ta-btn--primary' : 'ta-btn--ghost'}`} onClick={() => setDays(d)}>{d}d</button>
+          ))}
+          <button className="ta-btn ta-btn--sm ta-btn--ghost" onClick={() => loadStats(days)}><FiRefreshCw size={13} /></button>
+        </div>
+      </div>
+
+      <div className="ta-stats" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        <div className="ta-stat-card">
+          <div className="ta-stat-card__icon ta-stat-card__icon--primary"><FiTrendingUp /></div>
+          <div className="ta-stat-card__info"><h4>{totalVisits}</h4><span>Total Pageviews ({days}d)</span></div>
+        </div>
+        <div className="ta-stat-card">
+          <div className="ta-stat-card__icon ta-stat-card__icon--success"><FiGlobe /></div>
+          <div className="ta-stat-card__info"><h4>{topPages.length}</h4><span>Unique Pages Visited</span></div>
+        </div>
+        <div className="ta-stat-card">
+          <div className="ta-stat-card__icon ta-stat-card__icon--info"><FiActivity /></div>
+          <div className="ta-stat-card__info"><h4>{topRefs.length}</h4><span>Traffic Sources</span></div>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        <div className="ta-table-wrapper">
+          <div className="ta-table-header"><h3>Top Pages</h3></div>
+          {topPages.length === 0 ? (
+            <div className="ta-empty" style={{ padding: '32px' }}><div className="ta-empty__icon">📄</div><h4>No data yet</h4><p>Visit your site to start tracking.</p></div>
+          ) : (
+            <table className="ta-table">
+              <thead><tr><th>Page</th><th>Views</th></tr></thead>
+              <tbody>{topPages.map(([page, count], i) => (
+                <tr key={i}>
+                  <td style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{page}</td>
+                  <td><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ background: 'var(--ta-primary)', height: 6, borderRadius: 3, width: `${Math.round((count / (topPages[0]?.[1] || 1)) * 80)}px` }} />{count}</div></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          )}
+        </div>
+        <div className="ta-table-wrapper">
+          <div className="ta-table-header"><h3>Traffic Sources</h3></div>
+          {topRefs.length === 0 ? (
+            <div className="ta-empty" style={{ padding: '32px' }}><div className="ta-empty__icon">🔗</div><h4>No referrer data yet</h4></div>
+          ) : (
+            <table className="ta-table">
+              <thead><tr><th>Source</th><th>Visits</th></tr></thead>
+              <tbody>{topRefs.map(([ref, count], i) => (
+                <tr key={i}>
+                  <td style={{ fontSize: '0.85rem' }}>{ref}</td>
+                  <td><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ background: 'var(--ta-success)', height: 6, borderRadius: 3, width: `${Math.round((count / (topRefs[0]?.[1] || 1)) * 80)}px` }} />{count}</div></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          )}
+        </div>
+      </div>
+
+      <div className="ta-profile-section" style={{ borderLeft: '3px solid var(--ta-primary)' }}>
+        <div className="ta-profile-section__header"><h3>💡 Enhanced Tracking Setup</h3></div>
+        <div className="ta-profile-section__body">
+          <p style={{ color: 'var(--ta-text-secondary)', marginBottom: 12 }}>For richer analytics, add your tracking IDs in Site Settings:</p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <span className="ta-badge ta-badge--primary">Google Analytics 4</span>
+            <span className="ta-badge ta-badge--info">Facebook Pixel</span>
+            <span className="ta-badge ta-badge--success">LinkedIn Insight Tag</span>
+          </div>
+          <p style={{ color: 'var(--ta-text-secondary)', marginTop: 12, fontSize: '0.85rem' }}>→ Go to <strong>Admin → Site Settings</strong> to add your tracking IDs.</p>
         </div>
       </div>
     </div>

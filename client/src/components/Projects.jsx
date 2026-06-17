@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FiGithub, FiGlobe } from 'react-icons/fi';
 import { getImageUrl, getProjects } from '../api';
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
     getProjects()
@@ -18,11 +19,27 @@ export default function Projects() {
       });
   }, []);
 
+  // Scroll animation observer
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        el.querySelectorAll('.animate-on-scroll').forEach((child, i) => {
+          setTimeout(() => child.classList.add('visible'), i * 90);
+        });
+        observer.unobserve(el);
+      }
+    }, { threshold: 0.08 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="section section-bg-subtle" id="projects">
+    <section className="section section-bg-subtle" id="projects" ref={sectionRef}>
       <div className="container">
         {/* Section Header */}
-        <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto' }}>
+        <div className="animate-on-scroll" style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto' }}>
           <div className="section__badge">Solutions</div>
           <h2 className="section__title">
             Things I've <span className="text-gradient">built</span>
@@ -44,7 +61,7 @@ export default function Projects() {
               
               return (
               <div
-                className="project-stack-card"
+                className="project-stack-card animate-on-scroll"
                 key={p._id || p.title}
                 style={{
                   '--accent': accentColor,

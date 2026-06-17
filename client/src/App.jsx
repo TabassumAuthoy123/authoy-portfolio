@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Articles from './pages/Articles';
@@ -7,6 +7,8 @@ import Gallery from './pages/Gallery';
 import Login from './pages/Login';
 import Admin from './pages/Admin';
 import ClientPortal from './pages/ClientPortal';
+import Analytics from './components/Analytics';
+import { getSettings } from './api';
 import './App.css';
 
 /* ═══════════════════════════════════════
@@ -119,9 +121,18 @@ function NotFound() {
 }
 
 function App() {
+  const [siteSettings, setSiteSettings] = useState(null);
+
+  useEffect(() => {
+    getSettings()
+      .then(res => setSiteSettings(res.data))
+      .catch(() => {});
+  }, []);
+
   return (
     <BrowserRouter>
       <ScrollToHash />
+      <Analytics settings={siteSettings} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/articles" element={<Articles />} />
