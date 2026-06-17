@@ -12,6 +12,7 @@ import {
 } from 'react-icons/fi';
 import ReactQuill from 'react-quill-new';
 import AdminPreview from '../components/AdminPreview';
+import MarketingHub from '../components/MarketingHub';
 import 'react-quill-new/dist/quill.snow.css';
 import {
   verifyToken,
@@ -157,6 +158,7 @@ export default function Admin() {
       title: 'BUSINESS',
       items: [
         { key: 'clients', label: 'Clients (B2B)', icon: <FiUsers /> },
+        { key: 'marketing', label: 'Marketing Hub', icon: <FiTrendingUp /> },
         { key: 'analytics', label: 'Visitor Analytics', icon: <FiBarChart2 /> },
       ],
     },
@@ -294,6 +296,11 @@ export default function Admin() {
           {/* ── LIVE PREVIEW ── */}
           {tab === 'preview' && (
             <AdminPreview />
+          )}
+
+          {/* ── MARKETING HUB ── */}
+          {tab === 'marketing' && (
+            <MarketingHub showNotif={showNotif} />
           )}
 
           {/* ── VISITOR ANALYTICS ── */}
