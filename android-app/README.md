@@ -20,7 +20,7 @@ A native Android application built with **Kotlin** and **Jetpack Compose** that 
 
 Use these credentials to access the Admin Dashboard inside the app:
 - **Admin Email**: `authoy@email.com`
-- **Password**: `admin` (or the custom password you configured)
+- **Password**: `AuthoyAdmin@2026!` (Connects to the same database backend API)
 
 ---
 
