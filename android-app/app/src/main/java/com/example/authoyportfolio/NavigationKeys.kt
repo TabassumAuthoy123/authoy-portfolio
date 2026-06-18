@@ -26,3 +26,9 @@ data object AdminDashboard : NavKey
 
 @Serializable
 data object Messages : NavKey
+
+@Serializable
+data object AiAssistant : NavKey
+
+@Serializable
+data object ShareQR : NavKey

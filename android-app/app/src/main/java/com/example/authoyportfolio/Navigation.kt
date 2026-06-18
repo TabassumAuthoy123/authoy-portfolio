@@ -67,6 +67,14 @@ fun MainNavigation(authManager: AuthManager) {
             authManager = authManager
           )
         }
+
+        entry<AiAssistant> {
+          AiAssistantScreen(onBack = { backStack.removeLastOrNull() })
+        }
+
+        entry<ShareQR> {
+          ShareScreen(onBack = { backStack.removeLastOrNull() })
+        }
       },
   )
 }

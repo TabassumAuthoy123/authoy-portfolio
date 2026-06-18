@@ -78,6 +78,15 @@ fun HomeScreen(
                 }
             )
         },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { onNavigateToSection("ai_assistant") },
+                containerColor = Teal500,
+                contentColor = Color.White
+            ) {
+                Icon(Icons.Default.SmartToy, contentDescription = "AI Assistant")
+            }
+        },
         containerColor = DarkNavy
     ) { paddingValues ->
         Box(

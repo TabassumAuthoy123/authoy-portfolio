@@ -2,6 +2,8 @@ package com.example.authoyportfolio.data
 
 import com.example.authoyportfolio.data.api.ApiClient
 import com.example.authoyportfolio.data.model.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 interface DataRepository {
     suspend fun getProfile(): Profile
@@ -18,17 +20,76 @@ interface DataRepository {
 }
 
 class DefaultDataRepository : DataRepository {
-    override suspend fun getProfile(): Profile = ApiClient.api.getProfile()
+    private val json = Json { 
+        ignoreUnknownKeys = true 
+        coerceInputValues = true
+    }
+
+    override suspend fun getProfile(): Profile {
+        return try {
+            val res = ApiClient.api.getProfile()
+            CacheManager.saveCache("profile", json.encodeToString(res))
+            res
+        } catch (e: Exception) {
+            val cached = CacheManager.getCache("profile")
+            if (cached != null) json.decodeFromString<Profile>(cached) else throw e
+        }
+    }
     
-    override suspend fun getProjects(): List<Project> = ApiClient.api.getProjects()
+    override suspend fun getProjects(): List<Project> {
+        return try {
+            val res = ApiClient.api.getProjects()
+            CacheManager.saveCache("projects", json.encodeToString(res))
+            res
+        } catch (e: Exception) {
+            val cached = CacheManager.getCache("projects")
+            if (cached != null) json.decodeFromString<List<Project>>(cached) else throw e
+        }
+    }
     
-    override suspend fun getSkills(): List<Skill> = ApiClient.api.getSkills()
+    override suspend fun getSkills(): List<Skill> {
+        return try {
+            val res = ApiClient.api.getSkills()
+            CacheManager.saveCache("skills", json.encodeToString(res))
+            res
+        } catch (e: Exception) {
+            val cached = CacheManager.getCache("skills")
+            if (cached != null) json.decodeFromString<List<Skill>>(cached) else throw e
+        }
+    }
     
-    override suspend fun getExperience(): List<Experience> = ApiClient.api.getExperience()
+    override suspend fun getExperience(): List<Experience> {
+        return try {
+            val res = ApiClient.api.getExperience()
+            CacheManager.saveCache("experience", json.encodeToString(res))
+            res
+        } catch (e: Exception) {
+            val cached = CacheManager.getCache("experience")
+            if (cached != null) json.decodeFromString<List<Experience>>(cached) else throw e
+        }
+    }
     
-    override suspend fun getAchievements(): List<Achievement> = ApiClient.api.getAchievements()
+    override suspend fun getAchievements(): List<Achievement> {
+        return try {
+            val res = ApiClient.api.getAchievements()
+            CacheManager.saveCache("achievements", json.encodeToString(res))
+            res
+        } catch (e: Exception) {
+            val cached = CacheManager.getCache("achievements")
+            if (cached != null) json.decodeFromString<List<Achievement>>(cached) else throw e
+        }
+    }
     
-    override suspend fun getArticles(): List<Article> = ApiClient.api.getArticles()
+    override suspend fun getArticles(): List<Article> {
+        return try {
+            val res = ApiClient.api.getArticles()
+            CacheManager.saveCache("articles", json.encodeToString(res))
+            res
+        } catch (e: Exception) {
+            val cached = CacheManager.getCache("articles")
+            if (cached != null) json.decodeFromString<List<Article>>(cached) else throw e
+        }
+    }
     
     override suspend fun sendContact(name: String, email: String, message: String): Map<String, String> {
         return ApiClient.api.sendContact(ContactRequest(name, email, message))

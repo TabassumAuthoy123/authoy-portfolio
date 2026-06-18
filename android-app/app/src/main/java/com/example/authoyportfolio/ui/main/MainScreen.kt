@@ -91,6 +91,7 @@ fun MainScreen(
                                 "about" -> onItemClick(About)
                                 "skills" -> activeTab = PortfolioTab.Skills
                                 "projects" -> activeTab = PortfolioTab.Projects
+                                "ai_assistant" -> onItemClick(AiAssistant)
                             }
                         }
                     )
@@ -182,6 +183,24 @@ fun MoreMenuScreen(
                     desc = "Get in touch directly with administrative messages",
                     icon = Icons.Default.Email,
                     onClick = { onNavigate(Contact) }
+                )
+            }
+
+            item {
+                MenuOptionRow(
+                    title = "AI Portfolio Assistant",
+                    desc = "Chat with a virtual clone of Authoy about her experience",
+                    icon = Icons.Default.SmartToy,
+                    onClick = { onNavigate(AiAssistant) }
+                )
+            }
+
+            item {
+                MenuOptionRow(
+                    title = "Share Portfolio",
+                    desc = "Generate QR code or export contact card vCard",
+                    icon = Icons.Default.QrCode,
+                    onClick = { onNavigate(ShareQR) }
                 )
             }
 
