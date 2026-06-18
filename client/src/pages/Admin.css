@@ -468,6 +468,57 @@
     color: var(--ta-text-secondary);
 }
 
+/* Header Search Bar */
+.ta-header__search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ta-bg);
+    border: 1px solid var(--ta-border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    position: relative;
+    max-width: 280px;
+    width: 100%;
+}
+
+.ta-header__search svg {
+    color: var(--ta-text-secondary);
+    flex-shrink: 0;
+}
+
+.ta-header__search input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--ta-text);
+    font-family: var(--ta-font);
+    font-size: 0.85rem;
+    width: 100%;
+}
+
+.ta-header__search input::placeholder {
+    color: var(--ta-text-secondary);
+    opacity: 0.7;
+}
+
+.ta-header__search-clear {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--ta-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.ta-header__search-clear:hover {
+    background: var(--ta-hover);
+    color: var(--ta-text);
+}
+
 
 /* ═══════════════════════════════════════════════════════════
    CONTENT AREA
@@ -1230,6 +1281,71 @@
     }
 }
 
+/* Notification Toast */
+.ta-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    box-shadow: var(--ta-shadow-lg);
+    z-index: 999;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #fff;
+    animation: ta-toast-slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes ta-toast-slideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.ta-toast--success {
+    background: var(--ta-success);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ta-toast--error {
+    background: var(--ta-danger);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Skills Section Admin Styles */
+.ta-skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.ta-skill-pill {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--ta-hover);
+    padding: 6px 12px;
+    border-radius: 100px;
+    border: 1px solid var(--ta-border);
+    font-size: 0.9rem;
+    gap: 8px;
+    color: var(--ta-text);
+    transition: all 0.2s ease;
+}
+
+.ta-skill-pill:hover {
+    border-color: var(--ta-primary);
+    background-color: var(--ta-primary-light);
+}
+
 
 /* ═══════════════════════════════════════════════════════════
    LOGIN PAGE
@@ -1489,6 +1605,24 @@
     .ta-table thead th,
     .ta-table tbody td {
         padding: 10px 12px;
+    }
+
+    .ta-login__form-side {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ta-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .ta-header__search {
+        max-width: 130px;
+    }
+    
+    .ta-breadcrumb {
+        display: none;
     }
 }
 

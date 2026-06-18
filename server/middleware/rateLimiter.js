@@ -14,6 +14,7 @@ const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.NODE_ENV !== 'production',
 });
 
 // Strict limiter for auth routes (login, forgot-password)
@@ -27,6 +28,7 @@ const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true, // Only count failed attempts
+  skip: () => process.env.NODE_ENV !== 'production',
 });
 
 // Contact form limiter (prevent spam)
@@ -39,6 +41,7 @@ const contactLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.NODE_ENV !== 'production',
 });
 
 // Upload limiter
@@ -51,6 +54,7 @@ const uploadLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.NODE_ENV !== 'production',
 });
 
 module.exports = {

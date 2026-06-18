@@ -395,7 +395,7 @@ export default function Admin() {
                     <p>{searchQuery ? 'Try a different search term.' : 'Click "Add Skill" to create your first item.'}</p>
                   </div>
                 ) : (
-                  <div className="ta-skills-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
+                  <div className="ta-skills-grid">
                     {groupedSkills.map(group => group.items.length > 0 && (
                       <div key={group.category} className="ta-stat-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '20px' }}>
                         <h4 style={{ textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '0.1em', color: 'var(--ta-text-secondary)', marginBottom: '16px', borderBottom: '1px solid var(--ta-border)', paddingBottom: '8px', width: '100%' }}>
@@ -403,7 +403,7 @@ export default function Admin() {
                         </h4>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                           {group.items.map(item => (
-                            <div key={item._id} className="ta-skill-pill" style={{ display: 'inline-flex', alignItems: 'center', backgroundColor: 'var(--ta-bg-primary)', padding: '6px 12px', borderRadius: '100px', border: '1px solid var(--ta-border)', fontSize: '0.9rem', gap: '8px' }}>
+                            <div key={item._id} className="ta-skill-pill">
                               <span>{item.name}</span>
                               <div style={{ display: 'flex', gap: '4px', opacity: 0.7 }}>
                                 <button type="button" className="ta-action-btn ta-action-btn--edit" onClick={() => openEdit(item)} style={{ padding: 2, background: 'transparent' }}><FiEdit2 size={12} /></button>

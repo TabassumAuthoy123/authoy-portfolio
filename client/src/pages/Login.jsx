@@ -33,8 +33,8 @@ export default function Login() {
       const res = await login({ email, password });
       localStorage.setItem('token', res.data.token);
       navigate('/admin');
-    } catch {
-      setError('Invalid email or password.');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Invalid email or password.');
     }
     setLoading(false);
   };
