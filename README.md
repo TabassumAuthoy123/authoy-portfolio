@@ -38,9 +38,12 @@ This platform is built on the **MERN Stack** (**MongoDB, Express, React, Node.js
 
 | System Component | Access URL | Default Login Credentials | Role / Purpose |
 |:---|:---|:---|:---|
-| **Admin Panel** | `http://localhost:5173/login` | **Email:** `authoy@email.com`<br>**Password:** `AuthoyAdmin@2026!` | Full CMS CRUD, Preview, Analytics & Client Management |
+| **Admin Panel (Web & Mobile)** | `http://localhost:5173/login` | **Email:** `authoy@email.com`<br>**Password:** `AuthoyAdmin@2026!` | Full CMS CRUD, Preview, Analytics & Client Management |
 | **B2B Client Portal** | `http://localhost:5173/client-portal` | **Client Key:** `pk_authoyb2cclientkey2026` | Enterprise developer API analytics dashboard |
 | **API Backend** | `http://localhost:5000/api` | *Authorized Bearer token required for write endpoints* | Express core API service gateway |
+
+> [!NOTE]
+> **No Database Setup Required Fallback:** If you do not have MongoDB running locally, the server will automatically launch an in-memory database (`mongodb-memory-server`) and seed itself with the default credentials above, making it fully operational on any device instantly.
 
 > [!TIP]
 > Admin login credentials can be changed in the dashboard under **Security** -> **Change Password**.
@@ -150,16 +153,34 @@ npm.cmd run dev
 ---
 
 ## 🐳 Running Locally with Docker
-If you have Docker and Docker Compose installed, you can skip the Node and MongoDB installations completely and run the entire application stacked in containerized environments:
 
-```bash
-# Run from the project root directory containing docker-compose.yml:
-docker-compose up --build
-```
-This automatically spins up:
-- MongoDB Service on port `27017`
-- Express Node server on port `5000`
-- React Vite application on port `5173`
+If you have Docker and Docker Compose installed, you can skip the Node and MongoDB installations completely and run the entire application stacked in containerized environments on any device:
+
+### A-Z Step-by-Step Execution Guide:
+
+1. **Start the Containers:**
+   Run from the project root directory containing `docker-compose.yml`:
+   ```bash
+   docker-compose up --build
+   ```
+   This automatically downloads and configures:
+   - **MongoDB Service** on port `27017`
+   - **Express Node server** on port `5000`
+   - **React Vite application** on port `5173`
+
+2. **Access the Portals:**
+   - **Main Portfolio**: `http://localhost:5173`
+   - **Admin Panel**: `http://localhost:5173/login` (Login with `authoy@email.com` / `AuthoyAdmin@2026!`)
+
+3. **Stop & Clean Up:**
+   To stop the services gracefully:
+   ```bash
+   docker-compose down
+   ```
+   To stop the services and completely clear the database volumes (for a fresh seed next run):
+   ```bash
+   docker-compose down -v
+   ```
 
 ---
 
@@ -417,7 +438,7 @@ The repository includes a mobile companion app built in Jetpack Compose that con
 ### 🔑 Admin Credentials
 To log into the administrator portal inside the app:
 * **Admin Email**: `authoy@email.com`
-* **Password**: `admin` (or the custom password you configured)
+* **Password**: `AuthoyAdmin@2026!` (Connects to the same database backend API)
 
 ### Build & Package APK
 

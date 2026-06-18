@@ -1685,6 +1685,12 @@
     flex: 1;
     overflow-x: auto;
     padding-bottom: 2px;
+    scrollbar-width: none; /* Hide scrollbar in Firefox */
+    -ms-overflow-style: none;  /* Hide scrollbar in IE and Edge */
+}
+
+.preview-section-tabs::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in Chrome, Safari and Opera */
 }
 
 .preview-section-tab {
