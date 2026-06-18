@@ -414,6 +414,11 @@ See [.env.example](./.env.example) for all required variables.
 
 The repository includes a mobile companion app built in Jetpack Compose that connects to the backend portfolio API.
 
+### 🔑 Admin Credentials
+To log into the administrator portal inside the app:
+* **Admin Email**: `authoy@email.com`
+* **Password**: `admin` (or the custom password you configured)
+
 ### Build & Package APK
 
 1. Ensure the backend server is running at `http://localhost:5000` (or `http://10.0.2.2:5000` inside the Android Emulator).
@@ -435,11 +440,27 @@ $env:JAVA_HOME="C:\Users\SBD - Commercial 23\.android\jdk17\jdk-17.0.19+10"
 1. Start your Android Virtual Device (AVD) emulator inside Android Studio.
 2. Drag and drop the `app-debug.apk` file directly onto the active emulator screen.
 3. The app will install automatically. Open it from the app drawer.
+4. **Note:** The emulator uses `http://10.0.2.2:5000/api/` as its default endpoint, which connects directly to the server running on your host machine.
 
 #### On a Physical Mobile Device
-1. Transfer the `app-debug.apk` file to your Android phone (via USB, Google Drive, share apps, etc.).
-2. Locate the APK file on your mobile using a File Manager and tap it to install. (Enable "Install from Unknown Sources" if prompted).
-3. **Note:** To see dynamic data from the backend, make sure your mobile and server are on the same Wi-Fi network, and update the base API URL in the code to your local machine's IP address instead of `10.0.2.2`.
+1. **Enable Developer Options**:
+   * Open your phone's **Settings**.
+   * Go to **About Phone** (usually at the bottom).
+   * Find **Build number** and tap it **7 times** consecutively. You will see a toast saying "You are now a developer!".
+2. **Enable USB Debugging**:
+   * Go back to the main **Settings** screen and select **System** -> **Developer options**.
+   * Scroll down and toggle on **USB debugging**.
+3. **Install the APK**:
+   * Transfer the `app-debug.apk` file to your phone (via USB cable, Google Drive, or email).
+   * Open the APK on your phone using a File Manager and select **Install**. If prompted, allow installations from "Unknown Sources".
+4. **Configure Local API Connection**:
+   * Ensure your phone and your computer are connected to the **same Wi-Fi network**.
+   * Find your computer's local IP address (Windows: run `ipconfig` in cmd; Mac/Linux: run `ifconfig`).
+   * Update the base API URL in `android-app/app/build.gradle.kts` to:
+     ```kotlin
+     buildConfigField("String", "API_BASE_URL", "\"http://<YOUR_LOCAL_IP>:5000/api/\"")
+     ```
+   * Recompile and install the APK to pull live database data onto your phone.
 
 ---
 
