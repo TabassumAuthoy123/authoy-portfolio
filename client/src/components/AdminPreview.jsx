@@ -2,10 +2,16 @@
  * AdminPreview.jsx — Live B2C Site Preview System for Admin CMS
  *
  * Shows a scaled, real-time preview of each portfolio section.
- * Uses the same components as the B2C frontend but in a sandboxed container.
+ * Supports URL params for section pre-selection, viewport simulation,
+ * and smooth transitions between sections.
  */
 import { useState, useEffect } from 'react';
-import { FiEye, FiExternalLink, FiRefreshCw, FiLayout, FiUser, FiBox, FiGlobe, FiBriefcase, FiAward, FiBook } from 'react-icons/fi';
+import { useSearchParams } from 'react-router-dom';
+import {
+  FiEye, FiExternalLink, FiRefreshCw, FiLayout, FiUser, FiBox,
+  FiGlobe, FiBriefcase, FiAward, FiBook, FiMonitor, FiTablet, FiSmartphone,
+  FiMaximize2
+} from 'react-icons/fi';
 import { getProfile, getProjects, getSkills, getExperience, getAchievements, getAllArticles, getImageUrl } from '../api';
 
 const SECTION_TABS = [
@@ -18,14 +24,41 @@ const SECTION_TABS = [
   { id: 'articles',     label: 'Articles',      icon: <FiBook /> },
 ];
 
+const VIEWPORTS = [
+  { id: 'desktop', icon: <FiMonitor />, label: 'Desktop', width: '100%' },
+  { id: 'tablet', icon: <FiTablet />, label: 'Tablet', width: '768px' },
+  { id: 'mobile', icon: <FiSmartphone />, label: 'Mobile', width: '375px' },
+];
+
 export default function AdminPreview() {
-  const [activeSection, setActiveSection] = useState('hero');
+  const [searchParams] = useSearchParams();
+  const initialSection = searchParams.get('section') || 'hero';
+  const [activeSection, setActiveSection] = useState(initialSection);
   const [previewTheme, setPreviewTheme] = useState('dark');
+  const [viewport, setViewport] = useState('desktop');
   const [loading, setLoading] = useState(true);
+  const [transitioning, setTransitioning] = useState(false);
   const [data, setData] = useState({
     profile: null, projects: [], skills: [], experience: [],
     achievements: [], articles: [],
   });
+
+  // Sync with URL param changes
+  useEffect(() => {
+    const section = searchParams.get('section');
+    if (section && SECTION_TABS.some(t => t.id === section)) {
+      switchSection(section);
+    }
+  }, [searchParams]);
+
+  const switchSection = (sectionId) => {
+    if (sectionId === activeSection) return;
+    setTransitioning(true);
+    setTimeout(() => {
+      setActiveSection(sectionId);
+      setTransitioning(false);
+    }, 200);
+  };
 
   useEffect(() => {
     const safeGet = async (fn, fallback) => {
@@ -62,6 +95,8 @@ export default function AdminPreview() {
     });
   };
 
+  const currentViewport = VIEWPORTS.find(v => v.id === viewport);
+
   return (
     <div className="preview-root">
       {/* Preview toolbar */}
@@ -76,7 +111,7 @@ export default function AdminPreview() {
             <button
               key={tab.id}
               className={`preview-section-tab ${activeSection === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveSection(tab.id)}
+              onClick={() => switchSection(tab.id)}
             >
               {tab.icon}
               <span>{tab.label}</span>
@@ -84,6 +119,20 @@ export default function AdminPreview() {
           ))}
         </div>
         <div className="preview-toolbar__right">
+          {/* Viewport toggles */}
+          <div className="preview-viewport-group">
+            {VIEWPORTS.map(vp => (
+              <button
+                key={vp.id}
+                className={`preview-viewport-btn ${viewport === vp.id ? 'active' : ''}`}
+                onClick={() => setViewport(vp.id)}
+                title={vp.label}
+              >
+                {vp.icon}
+              </button>
+            ))}
+          </div>
+          <div className="preview-toolbar-divider" />
           <button
             className="preview-theme-toggle"
             onClick={() => setPreviewTheme(t => t === 'dark' ? 'light' : 'dark')}
@@ -104,25 +153,32 @@ export default function AdminPreview() {
       {/* Preview frame container */}
       <div className={`preview-frame-wrapper ${previewTheme}`}>
         <div className="preview-scale-note">
-          Preview is scaled for CMS view • <a href="/" target="_blank" rel="noopener noreferrer">Open full site ↗</a>
+          <span className="preview-viewport-label">
+            <FiMaximize2 size={12} />
+            {currentViewport.label} View
+            {viewport !== 'desktop' && ` — ${currentViewport.width}`}
+          </span>
+          <a href="/" target="_blank" rel="noopener noreferrer">Open full site ↗</a>
         </div>
 
-        {loading ? (
-          <div className="preview-loading">
-            <div className="preview-spinner" />
-            <span>Loading preview data...</span>
-          </div>
-        ) : (
-          <div className="preview-section-view" data-theme={previewTheme}>
-            {activeSection === 'hero' && <HeroPreview profile={data.profile} />}
-            {activeSection === 'about' && <AboutPreview profile={data.profile} />}
-            {activeSection === 'skills' && <SkillsPreview skills={data.skills} />}
-            {activeSection === 'projects' && <ProjectsPreview projects={data.projects} />}
-            {activeSection === 'experience' && <ExperiencePreview experience={data.experience} />}
-            {activeSection === 'achievements' && <AchievementsPreview achievements={data.achievements} />}
-            {activeSection === 'articles' && <ArticlesPreview articles={data.articles} />}
-          </div>
-        )}
+        <div className="preview-viewport-frame" style={{ maxWidth: currentViewport.width }}>
+          {loading ? (
+            <div className="preview-loading">
+              <div className="preview-spinner" />
+              <span>Loading preview data...</span>
+            </div>
+          ) : (
+            <div className={`preview-section-view ${transitioning ? 'preview-fade-out' : 'preview-fade-in'}`} data-theme={previewTheme}>
+              {activeSection === 'hero' && <HeroPreview profile={data.profile} />}
+              {activeSection === 'about' && <AboutPreview profile={data.profile} />}
+              {activeSection === 'skills' && <SkillsPreview skills={data.skills} />}
+              {activeSection === 'projects' && <ProjectsPreview projects={data.projects} />}
+              {activeSection === 'experience' && <ExperiencePreview experience={data.experience} />}
+              {activeSection === 'achievements' && <AchievementsPreview achievements={data.achievements} />}
+              {activeSection === 'articles' && <ArticlesPreview articles={data.articles} />}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Data stats bar */}

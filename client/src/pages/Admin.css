@@ -1835,6 +1835,360 @@
 }
 
 /* ═══════════════════════════════════════
+   VIEWPORT SIMULATION
+   ═══════════════════════════════════════ */
+.preview-viewport-group {
+    display: flex;
+    gap: 2px;
+    background: var(--ta-bg);
+    border: 1px solid var(--ta-border);
+    border-radius: 8px;
+    padding: 2px;
+}
+
+.preview-viewport-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ta-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.preview-viewport-btn:hover {
+    background: var(--ta-hover);
+    color: var(--ta-text);
+}
+
+.preview-viewport-btn.active {
+    background: var(--ta-primary);
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(60, 80, 224, 0.3);
+}
+
+.preview-viewport-frame {
+    margin: 0 auto;
+    transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 600px;
+}
+
+.preview-viewport-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--ta-text-secondary);
+}
+
+.preview-toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--ta-border);
+    margin: 0 4px;
+}
+
+/* ─── Fade Transitions ─── */
+.preview-fade-in {
+    animation: previewFadeIn 0.3s ease forwards;
+}
+
+.preview-fade-out {
+    animation: previewFadeOut 0.2s ease forwards;
+}
+
+@keyframes previewFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes previewFadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-8px); }
+}
+
+/* ─── Glassmorphism Toolbar Enhancement ─── */
+.preview-toolbar {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(var(--ta-surface-rgb, 255, 255, 255), 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .preview-toolbar {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ═══════════════════════════════════════
+   PREVIEW SECTION BUTTON (per-tab)
+   ═══════════════════════════════════════ */
+.ta-preview-section-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border: 1px solid var(--ta-primary);
+    border-radius: 8px;
+    background: var(--ta-primary-light);
+    color: var(--ta-primary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ta-preview-section-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--ta-primary), #6366F1);
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+.ta-preview-section-btn:hover {
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 2px 12px rgba(60, 80, 224, 0.35);
+    transform: translateY(-1px);
+}
+
+.ta-preview-section-btn:hover::before {
+    opacity: 1;
+}
+
+.ta-preview-section-btn > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ═══════════════════════════════════════
+   API & INTEGRATIONS CARDS
+   ═══════════════════════════════════════ */
+.ta-api-section {
+    border-left: 3px solid var(--ta-primary);
+}
+
+.ta-api-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.ta-api-card {
+    background: var(--ta-bg);
+    border: 1px solid var(--ta-border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.25s ease;
+}
+
+.ta-api-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--ta-shadow);
+    border-color: var(--ta-primary);
+}
+
+.ta-api-card__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ta-text);
+    margin-bottom: 10px;
+}
+
+.ta-api-card__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 10px;
+}
+
+.ta-api-card__status--active {
+    background: var(--ta-success-light);
+    color: var(--ta-success);
+}
+
+.ta-api-card__status--inactive {
+    background: var(--ta-warning-light);
+    color: var(--ta-warning);
+}
+
+.ta-api-card__desc {
+    font-size: 0.82rem;
+    color: var(--ta-text-secondary);
+    line-height: 1.6;
+    margin: 0 0 10px;
+}
+
+.ta-api-card__desc code {
+    background: var(--ta-surface);
+    border: 1px solid var(--ta-border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--ta-primary);
+}
+
+.ta-api-card__endpoints {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ta-api-card__endpoints span {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--ta-primary-light);
+    color: var(--ta-primary);
+    border: 1px solid rgba(60, 80, 224, 0.15);
+}
+
+.ta-api-domain-info {
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.08), rgba(6, 182, 212, 0.08));
+    border: 1px solid rgba(13, 148, 136, 0.2);
+    border-radius: 12px;
+    padding: 20px 24px;
+}
+
+.ta-api-domain-info h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: var(--ta-text);
+}
+
+.ta-api-domain-info p {
+    font-size: 0.88rem;
+    color: var(--ta-text-secondary);
+    margin: 0 0 12px;
+    line-height: 1.6;
+}
+
+.ta-api-domain-info ol {
+    list-style: decimal;
+    padding-left: 20px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ta-api-domain-info li {
+    font-size: 0.85rem;
+    color: var(--ta-text-secondary);
+    line-height: 1.6;
+}
+
+.ta-api-domain-info code {
+    background: var(--ta-surface);
+    border: 1px solid var(--ta-border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #0d9488;
+}
+
+/* ═══════════════════════════════════════
+   ENHANCED CARD HOVER EFFECTS
+   ═══════════════════════════════════════ */
+.pv-project-card,
+.pv-achieve-card,
+.pv-article-card,
+.pv-skill-group {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pv-project-card:hover,
+.pv-achieve-card:hover,
+.pv-article-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: var(--ta-primary);
+}
+
+.pv-skill-group:hover {
+    border-color: rgba(13, 148, 136, 0.4);
+    box-shadow: 0 4px 16px rgba(13, 148, 136, 0.1);
+}
+
+/* ─── Stats bar glassmorphism ─── */
+.preview-stats-bar {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* ─── Preview section tab active pulse ─── */
+.preview-section-tab.active {
+    animation: tabPulse 0.3s ease;
+}
+
+@keyframes tabPulse {
+    0% { transform: scale(0.95); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE PREVIEW ADJUSTMENTS
+   ═══════════════════════════════════════ */
+@media (max-width: 768px) {
+    .preview-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .preview-section-tabs {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .preview-toolbar__right {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .preview-viewport-group {
+        display: none;
+    }
+
+    .ta-api-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pv-hero__content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .pv-about__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ═══════════════════════════════════════
    MARKETING HUB
    ═══════════════════════════════════════ */
 .mh-root { display: flex; flex-direction: column; gap: 20px; }

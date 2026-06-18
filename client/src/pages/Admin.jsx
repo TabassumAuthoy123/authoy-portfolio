@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import './Admin.css';
 import {
   FiPlus, FiEdit2, FiTrash2, FiLogOut, FiCheck, FiX,
@@ -8,7 +8,7 @@ import {
   FiGrid, FiMenu, FiChevronLeft, FiActivity, FiSettings,
   FiDownload, FiUpload, FiKey, FiLock, FiUsers, FiSearch,
   FiTrendingUp, FiClock, FiRefreshCw, FiDatabase, FiCopy,
-  FiExternalLink, FiMonitor, FiBarChart2
+  FiExternalLink, FiMonitor, FiBarChart2, FiZap, FiLink, FiCheck as FiCheckCircle
 } from 'react-icons/fi';
 import ReactQuill from 'react-quill-new';
 import AdminPreview from '../components/AdminPreview';
@@ -344,6 +344,8 @@ export default function Admin() {
             <DataTableSection
               title="All Projects"
               onAdd={openCreate}
+              previewSection="projects"
+              navigate={navigate}
               headers={['Title', 'Tech Stack', 'Order', 'Actions']}
               emptyMsg="No projects yet"
               rows={filterItems(data.projects, ['title', 'description', 'techStack']).map(item => (
@@ -381,7 +383,10 @@ export default function Admin() {
               <div className="ta-skills-admin">
                 <div className="ta-table-header" style={{ marginBottom: 20 }}>
                   <h3>All Skills {searchQuery && <span style={{fontSize:'0.8rem',color:'var(--ta-text-secondary)'}}>({filtered.length} results)</span>}</h3>
-                  <button className="ta-btn ta-btn--primary ta-btn--sm" onClick={openCreate}><FiPlus size={14} /> Add Skill</button>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className="ta-btn ta-btn--ghost ta-btn--sm ta-preview-section-btn" onClick={() => navigate('/admin/preview?section=skills')}><FiEye size={13} /> Preview</button>
+                    <button className="ta-btn ta-btn--primary ta-btn--sm" onClick={openCreate}><FiPlus size={14} /> Add Skill</button>
+                  </div>
                 </div>
                 {filtered.length === 0 ? (
                   <div className="ta-empty">
@@ -420,6 +425,8 @@ export default function Admin() {
             <DataTableSection
               title="All Experience"
               onAdd={openCreate}
+              previewSection="experience"
+              navigate={navigate}
               headers={['Role', 'Company', 'Duration', 'Type', 'Actions']}
               emptyMsg="No experience entries yet"
               rows={filterItems(data.experience, ['role', 'company', 'duration']).map(item => (
@@ -444,6 +451,8 @@ export default function Admin() {
             <DataTableSection
               title="All Achievements"
               onAdd={openCreate}
+              previewSection="achievements"
+              navigate={navigate}
               headers={['Title', 'Category', 'Date', 'Actions']}
               emptyMsg="No achievements yet"
               rows={filterItems(data.achievements, ['title', 'description', 'category']).map(item => (
@@ -470,6 +479,7 @@ export default function Admin() {
             <DataTableSection
               title="Leadership & Activities"
               onAdd={openCreate}
+              navigate={navigate}
               headers={['Title / Role', 'Organization', 'Date', 'Actions']}
               emptyMsg="No leadership items yet"
               rows={filterItems(data.leadership, ['title', 'role', 'organization']).map(item => (
@@ -501,6 +511,8 @@ export default function Admin() {
             <DataTableSection
               title="All Articles"
               onAdd={openCreate}
+              previewSection="articles"
+              navigate={navigate}
               headers={['Title', 'Category', 'Status', 'Read Time', 'Actions']}
               emptyMsg="No articles yet"
               rows={filterItems(data.articles, ['title', 'excerpt', 'category']).map(item => (
@@ -533,7 +545,10 @@ export default function Admin() {
             <>
               <div className="ta-table-header" style={{ background: 'var(--ta-surface)', border: '1px solid var(--ta-border)', borderRadius: '10px 10px 0 0', marginBottom: 0 }}>
                 <h3>All Gallery Items</h3>
-                <button className="ta-btn ta-btn--primary ta-btn--sm" onClick={openCreate}><FiPlus size={14} /> Add New</button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button className="ta-btn ta-btn--ghost ta-btn--sm ta-preview-section-btn" onClick={() => navigate('/admin/preview?section=hero')}><FiEye size={13} /> Preview</button>
+                  <button className="ta-btn ta-btn--primary ta-btn--sm" onClick={openCreate}><FiPlus size={14} /> Add New</button>
+                </div>
               </div>
               {data.gallery.length === 0 ? (
                 <div className="ta-empty" style={{ background: 'var(--ta-surface)', border: '1px solid var(--ta-border)', borderTop: 'none', borderRadius: '0 0 10px 10px' }}>
@@ -799,12 +814,19 @@ function DashboardTab({ data, navigate, unreadCount }) {
 /* ═══════════════════════════════════════
    DATA TABLE SECTION (Reusable)
    ═══════════════════════════════════════ */
-function DataTableSection({ title, onAdd, headers, rows, emptyMsg }) {
+function DataTableSection({ title, onAdd, headers, rows, emptyMsg, previewSection, navigate }) {
   return (
     <div className="ta-table-wrapper">
       <div className="ta-table-header">
         <h3>{title} <span style={{ fontSize: '0.8rem', color: 'var(--ta-text-secondary)', fontWeight: 400 }}>({rows.length})</span></h3>
-        <button className="ta-btn ta-btn--primary ta-btn--sm" onClick={onAdd}><FiPlus size={14} /> Add New</button>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {previewSection && navigate && (
+            <button className="ta-btn ta-btn--ghost ta-btn--sm ta-preview-section-btn" onClick={() => navigate(`/admin/preview?section=${previewSection}`)}>
+              <FiEye size={13} /> Preview
+            </button>
+          )}
+          <button className="ta-btn ta-btn--primary ta-btn--sm" onClick={onAdd}><FiPlus size={14} /> Add New</button>
+        </div>
       </div>
       {rows.length === 0 ? (
         <div className="ta-empty">
@@ -964,6 +986,78 @@ function SettingsTab({ showNotif }) {
           <div className="ta-form-group">
             <label className="ta-form-label">Footer Text</label>
             <input className="ta-form-input" value={settings.footerText || ''} onChange={e => set('footerText', e.target.value)} />
+          </div>
+        </div>
+      </div>
+
+      {/* API & Integrations */}
+      <div className="ta-profile-section ta-api-section">
+        <div className="ta-profile-section__header"><h3>🔌 API & Integrations Status</h3></div>
+        <div className="ta-profile-section__body">
+          <div className="ta-api-grid">
+            <div className="ta-api-card">
+              <div className="ta-api-card__header">
+                <FiLink size={18} />
+                <span>REST API</span>
+              </div>
+              <div className="ta-api-card__status ta-api-card__status--active">
+                <FiCheckCircle size={14} /> Active
+              </div>
+              <p className="ta-api-card__desc">All content is served via REST API endpoints at <code>/api/*</code></p>
+              <div className="ta-api-card__endpoints">
+                <span>/api/projects</span>
+                <span>/api/skills</span>
+                <span>/api/experience</span>
+                <span>/api/profile</span>
+                <span>/api/articles</span>
+                <span>/api/gallery</span>
+                <span>/api/contact</span>
+              </div>
+            </div>
+
+            <div className="ta-api-card">
+              <div className="ta-api-card__header">
+                <span style={{ fontSize: '1.1rem' }}>☁️</span>
+                <span>Cloudinary</span>
+              </div>
+              <div className={`ta-api-card__status ${settings.cloudinaryConfigured ? 'ta-api-card__status--active' : 'ta-api-card__status--inactive'}`}>
+                {settings.cloudinaryConfigured ? <><FiCheckCircle size={14} /> Connected</> : <><FiZap size={14} /> Not Configured</>}
+              </div>
+              <p className="ta-api-card__desc">Image uploads and CDN delivery. Set <code>CLOUDINARY_*</code> env vars to enable.</p>
+            </div>
+
+            <div className="ta-api-card">
+              <div className="ta-api-card__header">
+                <span style={{ fontSize: '1.1rem' }}>📧</span>
+                <span>Email (SMTP)</span>
+              </div>
+              <div className="ta-api-card__status ta-api-card__status--active">
+                <FiCheckCircle size={14} /> Configured
+              </div>
+              <p className="ta-api-card__desc">Gmail SMTP for OTP password reset and contact notifications.</p>
+            </div>
+
+            <div className="ta-api-card">
+              <div className="ta-api-card__header">
+                <span style={{ fontSize: '1.1rem' }}>📊</span>
+                <span>Analytics</span>
+              </div>
+              <div className={`ta-api-card__status ${settings.googleAnalyticsId ? 'ta-api-card__status--active' : 'ta-api-card__status--inactive'}`}>
+                {settings.googleAnalyticsId ? <><FiCheckCircle size={14} /> GA4 Active</> : <><FiZap size={14} /> Not Set</>}
+              </div>
+              <p className="ta-api-card__desc">Google Analytics 4, Facebook Pixel, LinkedIn Insight Tag.</p>
+            </div>
+          </div>
+
+          <div className="ta-api-domain-info">
+            <h4>🌐 Domain & Hosting Ready</h4>
+            <p>This app works on <strong>any domain</strong>. To deploy:</p>
+            <ol>
+              <li>Set <code>MONGO_URI</code> to your MongoDB Atlas connection string</li>
+              <li>Set <code>CLIENT_URL</code> to your frontend domain (e.g., <code>https://yourdomain.com</code>)</li>
+              <li>Set <code>VITE_API_URL</code> to your backend API URL (e.g., <code>https://api.yourdomain.com/api</code>)</li>
+              <li>Deploy to Vercel, Railway, Render, or any Node.js host</li>
+            </ol>
           </div>
         </div>
       </div>
